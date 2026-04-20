@@ -1,0 +1,36 @@
+@startuml
+left to right direction
+
+actor "Utilizador" as U
+actor "API Mercado Financeiro" as API
+actor "Serviço de Notificação" as NS
+
+rectangle "Financial Market Monitoring System" {
+
+  usecase "Gerir ações monitorizadas" as UC1
+  usecase "Configurar limites de alerta" as UC2
+  usecase "Configurar intervalo" as UC3
+  usecase "Consultar cotação" as UC4
+  usecase "Calcular variação percentual" as UC5
+  usecase "Enviar notificação" as UC6
+  usecase "Registar histórico" as UC7
+  usecase "Evitar notificações duplicadas" as UC8
+}
+
+U --> UC1
+U --> UC2
+U --> UC3
+
+API --> UC4
+
+UC4 --> UC5
+UC5 --> UC6
+UC6 --> NS
+
+UC6 --> UC7
+UC6 --> UC8
+
+UC5 ..> UC4 : <<include>>
+UC6 ..> UC5 : <<include>>
+
+@enduml
