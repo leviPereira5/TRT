@@ -4,6 +4,7 @@
 - System name: Financial Market Monitoring System
 - Slice covered: Monitorização de ações e envio de alertas
 
+
 ## Actors (2–4)
 - A1: Utilizador
 - A2: API de Mercado Financeiro
@@ -18,6 +19,11 @@
 - UC-06: Enviar notificação de alerta
 - UC-07: Registar histórico de alertas
 - UC-08: Evitar notificações duplicadas
+
+## Mapping Objectives → Use Cases
+- OBJ-1 → UC-01, UC-03, UC-04, UC-05, UC-06
+- OBJ-2 → UC-02, UC-05, UC-06, UC-08
+- OBJ-3 → UC-07
 
 ## Diagram file
 - Path: `docs/diagrams/use_case_diagram.puml`
