@@ -4,6 +4,18 @@
 - System name: Financial Market Monitoring System
 - Slice covered: Monitorização de ações e envio de alertas
 
+## System Boundary Definition
+O sistema inclui:
+- Monitorização de ações
+- Integração com API de mercado
+- Cálculo de variações percentuais
+- Gestão de configurações do utilizador
+- Envio de notificações
+- Persistência de dados
+
+O sistema NÃO inclui:
+- Implementação da API externa
+- Infraestrutura de envio (email/Telegram)
 
 ## Actors (2–4)
 - A1: Utilizador
@@ -24,6 +36,11 @@
 - OBJ-1 → UC-01, UC-03, UC-04, UC-05, UC-06
 - OBJ-2 → UC-02, UC-05, UC-06, UC-08
 - OBJ-3 → UC-07
+
+## Mapping CSF → Use Cases
+- CSF-1 → UC-04, UC-03
+- CSF-2 → UC-02, UC-05, UC-06, UC-08
+- CSF-3 → UC-07
 
 ## Diagram file
 - Path: `docs/diagrams/use_case_diagram.puml`
