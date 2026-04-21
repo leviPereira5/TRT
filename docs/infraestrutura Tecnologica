@@ -1,0 +1,142 @@
+# Infraestrutura Tecnológica
+
+## 1. Visão Geral
+
+O sistema será desenvolvido como uma aplicação web baseada em arquitetura cliente-servidor, permitindo a monitorização de ações em tempo quase real, configuração de alertas e visualização de histórico.
+
+A solução segue uma arquitetura modular, separando responsabilidades entre frontend, backend, persistência de dados e integrações externas.
+
+---
+
+## 2. Stack Tecnológica
+
+### Linguagem de Programação
+- Python 3.10+
+
+### Backend
+- Framework: Django
+- Responsabilidades:
+  - Lógica de negócio (monitorização, cálculo, regras)
+  - Integração com API de mercado financeiro
+  - Gestão de dados (ORM)
+  - Exposição de endpoints e renderização de templates
+
+### Frontend
+- HTML5
+- CSS3
+- Django Templates (renderização dinâmica)
+- (Opcional) JavaScript para interações dinâmicas
+
+### Base de Dados
+- SGBD:
+  - SQLite (ambiente de desenvolvimento)
+  - PostgreSQL (opcional, ambiente de produção)
+- ORM: Django ORM
+
+---
+
+## 3. Arquitetura do Sistema
+
+A aplicação segue o padrão Model-View-Template (MVT) do Django:
+
+- Model:
+  - Representação das entidades (Stock, Alert, Settings, StockPrice)
+- View:
+  - Processamento de pedidos e lógica de aplicação
+- Template:
+  - Interface com o utilizador (HTML dinâmico)
+
+Separação adicional por módulos:
+
+- Módulo de Monitorização
+- Módulo de Cálculo de Variação
+- Módulo de Notificações
+- Módulo de Persistência
+
+---
+
+## 4. Integrações Externas
+
+### API de Mercado Financeiro
+- Tipo: REST API
+- Comunicação: HTTPS
+- Funcionalidade:
+  - Obtenção de cotações em tempo real ou com atraso aceitável
+- Requisitos associados:
+  - REQ-2, REQ-13, REQ-12
+
+### Serviço de Notificações
+- Tipos:
+  - Email (SMTP)
+  - Telegram API (opcional)
+- Funcionalidade:
+  - Envio de alertas ao utilizador
+- Requisitos associados:
+  - REQ-7, REQ-8, REQ-9
+
+---
+
+## 5. Persistência de Dados
+
+O sistema utiliza uma base de dados relacional para armazenar:
+
+- Ações monitorizadas
+- Configurações do utilizador
+- Histórico de alertas
+- Cotações obtidas da API
+
+### Entidades principais:
+- Stock
+- UserSettings
+- StockPrice
+- Alert
+
+### Características:
+- Integridade referencial (chaves estrangeiras)
+- Persistência após reinício (REQ-14)
+- Suporte a histórico (REQ-9)
+
+---
+
+## 6. Robustez e Qualidade (Variant-driven)
+
+Para garantir desempenho e tolerância a falhas:
+
+- Timeout máximo de 5 segundos por requisição (REQ-13)
+- Retry automático em falhas de API
+- Fallback para último valor válido (REQ-12)
+- Validação de dados recebidos da API
+- Logging de erros e eventos
+- Continuidade do sistema mesmo com falhas externas
+
+---
+
+## 7. Segurança
+
+- Comunicação segura via HTTPS com APIs externas
+- Proteção de credenciais (API keys)
+- Validação de inputs do utilizador
+- Prevenção de dados inválidos ou inconsistentes
+
+---
+
+## 8. Escalabilidade e Evolução
+
+A arquitetura permite evolução futura para:
+
+- Suporte a múltiplos utilizadores
+- Interface web mais avançada (SPA)
+- Integração com múltiplas APIs financeiras
+- Deploy em ambiente cloud
+
+---
+
+## 9. Suporte aos Requisitos
+
+| Componente | Requisitos suportados |
+|-----------|----------------------|
+| Backend Django | REQ-1, REQ-3, REQ-4, REQ-5 |
+| API Integração | REQ-2, REQ-12, REQ-13 |
+| Cálculo | REQ-6 |
+| Notificações | REQ-7, REQ-8 |
+| Base de Dados | REQ-9, REQ-14 |
