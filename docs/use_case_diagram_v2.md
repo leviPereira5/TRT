@@ -31,6 +31,7 @@ O sistema NÃO inclui:
 - UC-06: Enviar notificação de alerta
 - UC-07: Registar histórico de alertas
 - UC-08: Evitar notificações duplicadas
+- UC-09: Monitorizar ações
 
 ## Modeling notes (refinement)
 - UC-04 inclui UC-05 pois o cálculo depende dos dados obtidos

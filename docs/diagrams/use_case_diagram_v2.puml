@@ -1,7 +1,7 @@
 @startuml
 left to right direction
 
-actor "Utilizador" as U
+actor Utilizador as U
 actor "API Mercado Financeiro" as API
 actor "Serviço de Notificação" as NS
 
@@ -9,23 +9,39 @@ rectangle "Financial Market Monitoring System" {
 
   usecase "Gerir ações monitorizadas" as UC1
   usecase "Configurar limites de alerta" as UC2
-  usecase "Configurar intervalo" as UC3
+  usecase "Configurar intervalo de monitorização" as UC3
+
+  usecase "Monitorizar ações" as UC9
   usecase "Consultar cotação" as UC4
   usecase "Calcular variação percentual" as UC5
-  usecase "Enviar notificação" as UC6
-  usecase "Registar histórico" as UC7
+  usecase "Verificar limites de alerta" as UC10
   usecase "Evitar notificações duplicadas" as UC8
+  usecase "Enviar notificação" as UC6
+  usecase "Registar histórico de alertas" as UC7
 }
 
+' Utilizador
 U --> UC1
 U --> UC2
 U --> UC3
+U --> UC9
 
+' Sistemas externos
 API --> UC4
 NS --> UC6
 
-UC4 ..> UC5 : <<include>>
-UC6 ..> UC7 : <<include>>
-UC6 ..> UC8 : <<include>>
+' Fluxo principal de monitorização
+UC9 ..> UC4 : <<include>>
+UC9 ..> UC5 : <<include>>
+UC9 ..> UC10 : <<include>>
+
+' Regras internas
+UC10 ..> UC8 : <<include>>
+
+' Notificação só acontece quando necessário (extend é mais correto aqui)
+UC6 ..> UC10 : <<extend>>
+
+' Registo de histórico sempre que há notificação
+UC7 ..> UC6 : <<include>>
 
 @enduml

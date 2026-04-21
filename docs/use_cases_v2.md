@@ -96,3 +96,65 @@ E3. Dados inconsistentes da API
 - Performance: Timeout de 5 segundos na API (REQ-13)
 - Robustez: Retry automático e fallback de dados (REQ-12)
 - Qualidade de dados: Validação de dados antes do cálculo
+
+## UC-09 — Monitorizar ações
+
+- Primary actor: Sistema
+- Supporting actors: API de Mercado Financeiro
+- Goal: Monitorizar automaticamente as ações configuradas e detetar variações relevantes
+- Preconditions:
+  - Pelo menos uma ação configurada
+  - Intervalo de monitorização definido
+  - Limites de alerta configurados
+- Trigger:
+  - Sistema inicia ciclo automático de monitorização
+
+- Postconditions (success):
+  - Cotações atualizadas
+  - Variações calculadas
+  - Alertas gerados quando necessário
+  - Histórico atualizado
+
+- Postconditions (failure/cancel):
+  - Sistema mantém último estado válido
+  - Erros são registados
+
+- Related requirements:
+  - REQ-2, REQ-3, REQ-6, REQ-7, REQ-12, REQ-13
+
+---
+
+### Main flow (happy path)
+1. Sistema inicia ciclo de monitorização
+2. Sistema consulta API de mercado financeiro
+3. Sistema obtém preços atualizados
+4. Sistema calcula variação percentual
+5. Sistema verifica limites definidos
+6. Sistema identifica se deve gerar alerta
+7. Sistema envia notificação (se necessário)
+8. Sistema regista evento no histórico
+9. Sistema aguarda próximo ciclo
+
+---
+
+### Alternative flows
+A1. Nenhuma variação relevante  
+→ Sistema continua monitorização sem gerar alertas
+
+A2. API responde com atraso  
+→ Sistema usa retry ou último valor válido
+
+A3. Intervalo configurado alterado durante execução  
+→ Sistema ajusta ciclo automaticamente
+
+---
+
+### Exceptions / errors
+E1. API indisponível  
+→ Sistema usa fallback (último valor válido)
+
+E2. Timeout de requisição  
+→ Sistema regista erro e tenta novamente
+
+E3. Dados inválidos da API  
+→ Sistema ignora dados e mantém estado anterior

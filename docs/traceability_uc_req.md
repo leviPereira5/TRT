@@ -12,6 +12,7 @@
 | UC-06 | REQ-7, REQ-8, REQ-9 | Notificações |
 | UC-07 | REQ-9, REQ-14 | Histórico |
 | UC-08 | REQ-8 | Anti-duplicação |
+| UC-09 | REQ-2, REQ-3, REQ-6, REQ-7, REQ-12, REQ-13 | Monitorização automática contínua |
 
 ## Coverage analysis
 
