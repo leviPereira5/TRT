@@ -11,42 +11,56 @@ A solução segue uma arquitetura modular, separando responsabilidades entre fro
 ## 2. Stack Tecnológica
 
 ### Linguagem de Programação
+
 - Python 3.10+
 
 ### Backend
-- Framework: Django
-- Responsabilidades:
+
+- **Framework:** Django  
+- **Responsabilidades:**
   - Lógica de negócio (monitorização, cálculo, regras)
   - Integração com API de mercado financeiro
   - Gestão de dados (ORM)
   - Exposição de endpoints e renderização de templates
 
 ### Frontend
+
 - HTML5
 - CSS3
 - Django Templates (renderização dinâmica)
 - (Opcional) JavaScript para interações dinâmicas
 
 ### Base de Dados
-- SGBD:
+
+- **SGBD:**
   - SQLite (ambiente de desenvolvimento)
   - PostgreSQL (opcional, ambiente de produção)
-- ORM: Django ORM
+
+- **ORM:** Django ORM
 
 ---
 
 ## 3. Arquitetura do Sistema
 
-A aplicação segue o padrão Model-View-Template (MVT) do Django:
+A aplicação segue o padrão **Model-View-Template (MVT)** do Django:
 
-- Model:
-  - Representação das entidades (Stock, Alert, Settings, StockPrice)
-- View:
-  - Processamento de pedidos e lógica de aplicação
-- Template:
-  - Interface com o utilizador (HTML dinâmico)
+### Model
 
-Separação adicional por módulos:
+- Representação das entidades:
+  - Stock
+  - Alert
+  - Settings
+  - StockPrice
+
+### View
+
+- Processamento de pedidos e lógica de aplicação
+
+### Template
+
+- Interface com o utilizador (HTML dinâmico)
+
+### Separação adicional por módulos
 
 - Módulo de Monitorização
 - Módulo de Cálculo de Variação
@@ -58,21 +72,31 @@ Separação adicional por módulos:
 ## 4. Integrações Externas
 
 ### API de Mercado Financeiro
-- Tipo: REST API
-- Comunicação: HTTPS
-- Funcionalidade:
+
+- **Tipo:** REST API  
+- **Comunicação:** HTTPS  
+
+- **Funcionalidade:**
   - Obtenção de cotações em tempo real ou com atraso aceitável
-- Requisitos associados:
-  - REQ-2, REQ-13, REQ-12
+
+- **Requisitos associados:**
+  - REQ-2
+  - REQ-13
+  - REQ-12
 
 ### Serviço de Notificações
-- Tipos:
+
+- **Tipos:**
   - Email (SMTP)
   - Telegram API (opcional)
-- Funcionalidade:
+
+- **Funcionalidade:**
   - Envio de alertas ao utilizador
-- Requisitos associados:
-  - REQ-7, REQ-8, REQ-9
+
+- **Requisitos associados:**
+  - REQ-7
+  - REQ-8
+  - REQ-9
 
 ---
 
@@ -85,13 +109,15 @@ O sistema utiliza uma base de dados relacional para armazenar:
 - Histórico de alertas
 - Cotações obtidas da API
 
-### Entidades principais:
+### Entidades principais
+
 - Stock
 - UserSettings
 - StockPrice
 - Alert
 
-### Características:
+### Características
+
 - Integridade referencial (chaves estrangeiras)
 - Persistência após reinício (REQ-14)
 - Suporte a histórico (REQ-9)
@@ -133,10 +159,10 @@ A arquitetura permite evolução futura para:
 
 ## 9. Suporte aos Requisitos
 
-| Componente | Requisitos suportados |
-|-----------|----------------------|
-| Backend Django | REQ-1, REQ-3, REQ-4, REQ-5 |
-| API Integração | REQ-2, REQ-12, REQ-13 |
-| Cálculo | REQ-6 |
-| Notificações | REQ-7, REQ-8 |
-| Base de Dados | REQ-9, REQ-14 |
+| Componente       | Requisitos suportados        |
+|------------------|------------------------------|
+| Backend Django   | REQ-1, REQ-3, REQ-4, REQ-5   |
+| API Integração   | REQ-2, REQ-12, REQ-13        |
+| Cálculo          | REQ-6                        |
+| Notificações     | REQ-7, REQ-8                 |
+| Base de Dados    | REQ-9, REQ-14                |
