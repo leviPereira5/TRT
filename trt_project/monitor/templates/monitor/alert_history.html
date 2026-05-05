@@ -1,77 +1,25 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <title>TRT — Alertas</title>
-    <style>
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:sans-serif;background:#f4f6f9;color:#222;transition:background .3s,color .3s}
-        header{background:#1a2b4a;color:#fff;padding:14px 32px;display:flex;align-items:center;gap:16px}
-        header h1{font-size:22px;cursor:pointer;white-space:nowrap}
-        header form{flex:1;max-width:320px}
-        header form input{width:100%;padding:8px 12px;border:none;border-radius:6px;font-size:14px}
-        .header-nav a{color:#aac4e8;text-decoration:none;margin-left:16px;font-size:14px}
-        .header-nav a:hover{color:#fff}
-        .dark-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:14px;margin-left:8px}
-        .container{max-width:1000px;margin:32px auto;padding:0 20px}
-        .card{background:#fff;border-radius:10px;padding:24px;box-shadow:0 1px 6px rgba(0,0,0,.09)}
-        .section-title{font-size:16px;font-weight:700;color:#1a2b4a;margin:0 0 16px;border-left:4px solid #17a589;padding-left:10px}
-        table{width:100%;border-collapse:collapse}
-        th,td{padding:10px 14px;border-bottom:1px solid #eee;text-align:left;font-size:14px}
-        th{background:#f5f7fa;color:#555}
-        .badge-high{background:#d4edda;color:#155724;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600}
-        .badge-low{background:#f8d7da;color:#721c24;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600}
-        a{color:#1a2b4a;font-weight:700;text-decoration:none}
-        a:hover{text-decoration:underline}
-        body.dark{background:#0f1117;color:#e0e0e0}
-        body.dark header{background:#0a0f1e}
-        body.dark .card{background:#1a1f2e;box-shadow:0 1px 4px rgba(0,0,0,.3)}
-        body.dark .section-title{color:#aac4e8}
-        body.dark th{background:#12172a;color:#aaa}
-        body.dark td{border-bottom-color:#2a2f3e}
-        body.dark tr:hover td{background:#1f2535}
-        body.dark a{color:#aac4e8}
-    </style>
-</head>
-<body>
-<header>
-    <h1 onclick="window.location='/'">TRT Invest</h1>
-    <form method="get" action="/search/">
-        <input type="text" name="q" placeholder="🔍  Pesquisar ativo...">
-    </form>
-    <nav class="header-nav">
-        <a href="{% url 'home' %}">Início</a>
-        <a href="{% url 'stock_list' %}">Meu Portfolio</a>
-        <a href="{% url 'alert_history' %}">Alertas</a>
-        <a href="{% url 'settings' %}">Configurações</a>
-    </nav>
-    <button class="dark-btn" onclick="toggleDark()" id="dark-btn">🌙</button>
-</header>
-<div class="container">
-    <div class="card">
-        <div class="section-title">Histórico de Alertas</div>
-        {% if alerts %}
-        <table>
-            <tr><th>Data/Hora</th><th>Ativo</th><th>Direção</th><th>Variação</th><th>Preço</th><th>Email</th></tr>
-            {% for alert in alerts %}
-            <tr>
-                <td>{{ alert.sent_at|date:"d/m/Y H:i:s" }}</td>
-                <td><a href="{% url 'stock_detail' alert.stock.symbol %}">{{ alert.stock.display_symbol }}</a></td>
-                <td>{% if alert.direction == 'high' %}<span class="badge-high">⬆ Alta</span>{% else %}<span class="badge-low">⬇ Baixa</span>{% endif %}</td>
-                <td>{{ alert.variation }}%</td>
-                <td>{{ alert.price }}</td>
-                <td>{% if alert.email_sent %}✅{% else %}—{% endif %}</td>
-            </tr>
-            {% endfor %}
-        </table>
-        {% else %}
-            <p style="color:#aaa">Nenhum alerta gerado ainda.</p>
-        {% endif %}
-    </div>
+{% extends 'monitor/base.html' %}
+{% block title %}TRT — Histórico de Alertas{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="section-title">Histórico de Alertas</div>
+    {% if alerts %}
+    <table>
+        <tr><th>Data/Hora</th><th>Ativo</th><th>Direção</th><th>Variação</th><th>Preço</th><th>Email</th></tr>
+        {% for alert in alerts %}
+        <tr>
+            <td>{{ alert.sent_at|date:"d/m/Y H:i:s" }}</td>
+            <td><a href="{% url 'stock_detail' alert.stock.symbol %}">{{ alert.stock.display_symbol }}</a></td>
+            <td>{% if alert.direction == 'high' %}<span class="badge-high">⬆ Alta</span>{% else %}<span class="badge-low">⬇ Baixa</span>{% endif %}</td>
+            <td>{{ alert.variation }}%</td>
+            <td>{{ alert.price }}</td>
+            <td>{% if alert.email_sent %}✅{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+        <p style="color:#aaa">Nenhum alerta gerado ainda.</p>
+    {% endif %}
 </div>
-<script>
-function toggleDark(){const d=document.body.classList.toggle('dark');localStorage.setItem('trt-dark',d);document.getElementById('dark-btn').textContent=d?'☀️':'🌙';}
-(function(){if(localStorage.getItem('trt-dark')==='true'){document.body.classList.add('dark');document.addEventListener('DOMContentLoaded',function(){const b=document.getElementById('dark-btn');if(b)b.textContent='☀️';});}})();
-</script>
-</body>
-</html>
+{% endblock %}

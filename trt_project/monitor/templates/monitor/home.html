@@ -1,76 +1,7 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-    <meta charset="UTF-8">
-    <title>TRT Invest</title>
-    <style>
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:sans-serif;background:#f4f6f9;color:#222;transition:background .3s,color .3s}
-        header{background:#1a2b4a;color:#fff;padding:14px 32px;display:flex;align-items:center;gap:16px}
-        header h1{font-size:22px;cursor:pointer;white-space:nowrap}
-        header form{flex:1;max-width:320px}
-        header form input{width:100%;padding:8px 12px;border:none;border-radius:6px;font-size:14px}
-        .header-nav a{color:#aac4e8;text-decoration:none;margin-left:16px;font-size:14px;white-space:nowrap}
-        .header-nav a:hover{color:#fff}
-        .dark-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:14px;margin-left:8px}
-        .filter-bar{background:#17a589;padding:0 32px;display:flex;align-items:center;gap:4px;overflow-x:auto}
-        .filter-btn{background:none;border:none;color:#d1f2eb;padding:14px 20px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;transition:all .2s}
-        .filter-btn:hover{color:#fff;background:rgba(255,255,255,.1)}
-        .filter-btn.active{color:#fff;border-bottom:3px solid #fff;background:rgba(255,255,255,.1)}
-        .container{max-width:1200px;margin:28px auto;padding:0 20px}
-        .section{display:none}
-        .section.active{display:block}
-        .section-title{font-size:17px;font-weight:700;color:#1a2b4a;margin:0 0 14px;border-left:4px solid #17a589;padding-left:10px}
-        .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
-        .card{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);cursor:pointer;transition:box-shadow .2s,transform .2s;text-decoration:none;color:inherit;display:block}
-        .card:hover{box-shadow:0 4px 16px rgba(0,0,0,.13);transform:translateY(-1px)}
-        .card .symbol{font-size:15px;font-weight:700;color:#1a2b4a}
-        .card .name{font-size:11px;color:#888;margin:2px 0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-        .card .price{font-size:18px;font-weight:700;color:#1a2b4a}
-        .card .change{font-size:13px;font-weight:600;margin-top:4px}
-        .up{color:#1a7a4a} .down{color:#c0392b}
-        table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08)}
-        th,td{padding:11px 14px;text-align:left;font-size:14px;border-bottom:1px solid #f0f0f0}
-        th{background:#f5f7fa;color:#555;font-weight:600}
-        tr:hover td{background:#f9fafb}
-        td a{text-decoration:none;color:#1a2b4a;font-weight:700}
-        td a:hover{text-decoration:underline}
-        .view-toggle{display:flex;gap:8px;margin-bottom:14px;justify-content:flex-end}
-        .view-btn{padding:6px 12px;border:1px solid #ddd;border-radius:5px;background:#fff;cursor:pointer;font-size:13px}
-        .view-btn.active{background:#1a2b4a;color:#fff;border-color:#1a2b4a}
-        .category-block{margin-bottom:36px}
-        .loading{color:#888;font-size:14px;padding:20px 0;grid-column:1/-1}
-        body.dark{background:#0f1117;color:#e0e0e0}
-        body.dark header{background:#0a0f1e}
-        body.dark .filter-bar{background:#0d7a63}
-        body.dark .card{background:#1a1f2e;box-shadow:0 1px 4px rgba(0,0,0,.3)}
-        body.dark .card .symbol{color:#aac4e8}
-        body.dark .card .price{color:#e0e0e0}
-        body.dark .card .name{color:#888}
-        body.dark table{background:#1a1f2e}
-        body.dark th{background:#12172a;color:#aaa}
-        body.dark td{border-bottom-color:#2a2f3e}
-        body.dark tr:hover td{background:#1f2535}
-        body.dark td a{color:#aac4e8}
-        body.dark .view-btn{background:#1a1f2e;color:#aaa;border-color:#2a2f3e}
-        body.dark .view-btn.active{background:#aac4e8;color:#0a0f1e}
-        body.dark .section-title{color:#aac4e8}
-    </style>
-</head>
-<body>
-<header>
-    <h1 onclick="window.location='/'">TRT Invest</h1>
-    <form method="get" action="/search/">
-        <input type="text" name="q" placeholder="🔍  Pesquisar ativo...">
-    </form>
-    <nav class="header-nav">
-        <a href="{% url 'stock_list' %}">Meu Portfolio</a>
-        <a href="{% url 'alert_history' %}">Alertas</a>
-        <a href="{% url 'settings' %}">Configurações</a>
-    </nav>
-    <button class="dark-btn" onclick="toggleDark()" id="dark-btn">🌙</button>
-</header>
+{% extends 'monitor/base.html' %}
+{% block title %}TRT Invest — Início{% endblock %}
 
+{% block filter_bar %}
 <div class="filter-bar">
     <button class="filter-btn active" onclick="showSection('all',this)">Todos</button>
     <button class="filter-btn" onclick="showSection('us',this)">🇺🇸 Ações EUA</button>
@@ -78,133 +9,20 @@
     <button class="filter-btn" onclick="showSection('fii',this)">🏢 Fundos Imobiliários</button>
     <button class="filter-btn" onclick="showSection('crypto',this)">₿ Criptomoedas</button>
 </div>
+{% endblock %}
 
-<div class="container">
+{% block content %}
 
-    <div id="section-all" class="section active">
-        <div class="category-block">
-            <div class="section-title">🇺🇸 Ações EUA</div>
-            <div class="view-toggle">
-                <button class="view-btn active" onclick="setView('all_us','cards',this)">⊞ Cards</button>
-                <button class="view-btn" onclick="setView('all_us','table',this)">☰ Tabela</button>
-            </div>
-            <div id="all_us-cards" class="cards">
-                {% for item in overview.us %}
-                <a class="card" href="{% url 'stock_detail' item.symbol %}">
-                    <div class="symbol">{{ item.symbol }}</div>
-                    <div class="name">{{ item.name }}</div>
-                    <div class="price">{{ item.currency }} {{ item.price }}</div>
-                    <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
-                </a>
-                {% empty %}<p class="loading">A carregar...</p>{% endfor %}
-            </div>
-            <table id="all_us-table" style="display:none">
-                <tr><th>Símbolo</th><th>Nome</th><th>Preço</th><th>Variação</th></tr>
-                {% for item in overview.us %}
-                <tr>
-                    <td><a href="{% url 'stock_detail' item.symbol %}">{{ item.symbol }}</a></td>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.currency }} {{ item.price }}</td>
-                    <td class="{% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-        <div class="category-block">
-            <div class="section-title">🇧🇷 Ações Brasil</div>
-            <div class="view-toggle">
-                <button class="view-btn active" onclick="setView('all_br','cards',this)">⊞ Cards</button>
-                <button class="view-btn" onclick="setView('all_br','table',this)">☰ Tabela</button>
-            </div>
-            <div id="all_br-cards" class="cards">
-                {% for item in overview.br %}
-                <a class="card" href="{% url 'stock_detail' item.symbol_yf %}">
-                    <div class="symbol">{{ item.symbol }}</div>
-                    <div class="name">{{ item.name }}</div>
-                    <div class="price">R$ {{ item.price }}</div>
-                    <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
-                </a>
-                {% empty %}<p class="loading">A carregar...</p>{% endfor %}
-            </div>
-            <table id="all_br-table" style="display:none">
-                <tr><th>Símbolo</th><th>Nome</th><th>Preço</th><th>Variação</th></tr>
-                {% for item in overview.br %}
-                <tr>
-                    <td><a href="{% url 'stock_detail' item.symbol_yf %}">{{ item.symbol }}</a></td>
-                    <td>{{ item.name }}</td>
-                    <td>R$ {{ item.price }}</td>
-                    <td class="{% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-        <div class="category-block">
-            <div class="section-title">🏢 Fundos Imobiliários</div>
-            <div class="view-toggle">
-                <button class="view-btn active" onclick="setView('all_fii','cards',this)">⊞ Cards</button>
-                <button class="view-btn" onclick="setView('all_fii','table',this)">☰ Tabela</button>
-            </div>
-            <div id="all_fii-cards" class="cards">
-                {% for item in overview.fii %}
-                <a class="card" href="{% url 'stock_detail' item.symbol_yf %}">
-                    <div class="symbol">{{ item.symbol }}</div>
-                    <div class="name">{{ item.name }}</div>
-                    <div class="price">R$ {{ item.price }}</div>
-                    <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
-                </a>
-                {% empty %}<p class="loading">A carregar...</p>{% endfor %}
-            </div>
-            <table id="all_fii-table" style="display:none">
-                <tr><th>Símbolo</th><th>Nome</th><th>Preço</th><th>Variação</th></tr>
-                {% for item in overview.fii %}
-                <tr>
-                    <td><a href="{% url 'stock_detail' item.symbol_yf %}">{{ item.symbol }}</a></td>
-                    <td>{{ item.name }}</td>
-                    <td>R$ {{ item.price }}</td>
-                    <td class="{% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-        <div class="category-block">
-            <div class="section-title">₿ Criptomoedas</div>
-            <div class="view-toggle">
-                <button class="view-btn active" onclick="setView('all_crypto','cards',this)">⊞ Cards</button>
-                <button class="view-btn" onclick="setView('all_crypto','table',this)">☰ Tabela</button>
-            </div>
-            <div id="all_crypto-cards" class="cards">
-                {% for item in overview.crypto %}
-                <a class="card" href="{% url 'stock_detail' item.symbol_yf %}">
-                    <div class="symbol">{{ item.symbol }}</div>
-                    <div class="name">{{ item.name }}</div>
-                    <div class="price">USD {{ item.price }}</div>
-                    <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
-                </a>
-                {% empty %}<p class="loading">A carregar...</p>{% endfor %}
-            </div>
-            <table id="all_crypto-table" style="display:none">
-                <tr><th>Símbolo</th><th>Nome</th><th>Preço (USD)</th><th>Variação</th></tr>
-                {% for item in overview.crypto %}
-                <tr>
-                    <td><a href="{% url 'stock_detail' item.symbol_yf %}">{{ item.symbol }}</a></td>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.price }}</td>
-                    <td class="{% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-    </div>
-
-    <div id="section-us" class="section">
+<div id="section-all" class="section active">
+    <div class="category-block">
         <div class="section-title">🇺🇸 Ações EUA</div>
         <div class="view-toggle">
-            <button class="view-btn active" onclick="setView('us','cards',this)">⊞ Cards</button>
-            <button class="view-btn" onclick="setView('us','table',this)">☰ Tabela</button>
+            <button class="view-btn active" onclick="setView('all_us','cards',this)">⊞ Cards</button>
+            <button class="view-btn" onclick="setView('all_us','table',this)">☰ Tabela</button>
         </div>
-        <div id="us-cards" class="cards">
+        <div id="all_us-cards" class="cards">
             {% for item in overview.us %}
-            <a class="card" href="{% url 'stock_detail' item.symbol %}">
+            <a class="market-card" href="{% url 'stock_detail' item.symbol %}">
                 <div class="symbol">{{ item.symbol }}</div>
                 <div class="name">{{ item.name }}</div>
                 <div class="price">{{ item.currency }} {{ item.price }}</div>
@@ -212,7 +30,7 @@
             </a>
             {% empty %}<p class="loading">A carregar...</p>{% endfor %}
         </div>
-        <table id="us-table" style="display:none">
+        <table id="all_us-table" style="display:none">
             <tr><th>Símbolo</th><th>Nome</th><th>Preço</th><th>Variação</th></tr>
             {% for item in overview.us %}
             <tr>
@@ -224,16 +42,15 @@
             {% endfor %}
         </table>
     </div>
-
-    <div id="section-br" class="section">
+    <div class="category-block">
         <div class="section-title">🇧🇷 Ações Brasil</div>
         <div class="view-toggle">
-            <button class="view-btn active" onclick="setView('br','cards',this)">⊞ Cards</button>
-            <button class="view-btn" onclick="setView('br','table',this)">☰ Tabela</button>
+            <button class="view-btn active" onclick="setView('all_br','cards',this)">⊞ Cards</button>
+            <button class="view-btn" onclick="setView('all_br','table',this)">☰ Tabela</button>
         </div>
-        <div id="br-cards" class="cards">
+        <div id="all_br-cards" class="cards">
             {% for item in overview.br %}
-            <a class="card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
                 <div class="symbol">{{ item.symbol }}</div>
                 <div class="name">{{ item.name }}</div>
                 <div class="price">R$ {{ item.price }}</div>
@@ -241,7 +58,7 @@
             </a>
             {% empty %}<p class="loading">A carregar...</p>{% endfor %}
         </div>
-        <table id="br-table" style="display:none">
+        <table id="all_br-table" style="display:none">
             <tr><th>Símbolo</th><th>Nome</th><th>Preço</th><th>Variação</th></tr>
             {% for item in overview.br %}
             <tr>
@@ -253,16 +70,15 @@
             {% endfor %}
         </table>
     </div>
-
-    <div id="section-fii" class="section">
+    <div class="category-block">
         <div class="section-title">🏢 Fundos Imobiliários</div>
         <div class="view-toggle">
-            <button class="view-btn active" onclick="setView('fii','cards',this)">⊞ Cards</button>
-            <button class="view-btn" onclick="setView('fii','table',this)">☰ Tabela</button>
+            <button class="view-btn active" onclick="setView('all_fii','cards',this)">⊞ Cards</button>
+            <button class="view-btn" onclick="setView('all_fii','table',this)">☰ Tabela</button>
         </div>
-        <div id="fii-cards" class="cards">
+        <div id="all_fii-cards" class="cards">
             {% for item in overview.fii %}
-            <a class="card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
                 <div class="symbol">{{ item.symbol }}</div>
                 <div class="name">{{ item.name }}</div>
                 <div class="price">R$ {{ item.price }}</div>
@@ -270,7 +86,7 @@
             </a>
             {% empty %}<p class="loading">A carregar...</p>{% endfor %}
         </div>
-        <table id="fii-table" style="display:none">
+        <table id="all_fii-table" style="display:none">
             <tr><th>Símbolo</th><th>Nome</th><th>Preço</th><th>Variação</th></tr>
             {% for item in overview.fii %}
             <tr>
@@ -282,16 +98,15 @@
             {% endfor %}
         </table>
     </div>
-
-    <div id="section-crypto" class="section">
+    <div class="category-block">
         <div class="section-title">₿ Criptomoedas</div>
         <div class="view-toggle">
-            <button class="view-btn active" onclick="setView('crypto','cards',this)">⊞ Cards</button>
-            <button class="view-btn" onclick="setView('crypto','table',this)">☰ Tabela</button>
+            <button class="view-btn active" onclick="setView('all_crypto','cards',this)">⊞ Cards</button>
+            <button class="view-btn" onclick="setView('all_crypto','table',this)">☰ Tabela</button>
         </div>
-        <div id="crypto-cards" class="cards">
+        <div id="all_crypto-cards" class="cards">
             {% for item in overview.crypto %}
-            <a class="card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
                 <div class="symbol">{{ item.symbol }}</div>
                 <div class="name">{{ item.name }}</div>
                 <div class="price">USD {{ item.price }}</div>
@@ -299,7 +114,7 @@
             </a>
             {% empty %}<p class="loading">A carregar...</p>{% endfor %}
         </div>
-        <table id="crypto-table" style="display:none">
+        <table id="all_crypto-table" style="display:none">
             <tr><th>Símbolo</th><th>Nome</th><th>Preço (USD)</th><th>Variação</th></tr>
             {% for item in overview.crypto %}
             <tr>
@@ -311,13 +126,129 @@
             {% endfor %}
         </table>
     </div>
-
 </div>
+
+<div id="section-us" class="section">
+    <div class="section-title">🇺🇸 Ações EUA</div>
+    <div class="view-toggle">
+        <button class="view-btn active" onclick="setView('us','cards',this)">⊞ Cards</button>
+        <button class="view-btn" onclick="setView('us','table',this)">☰ Tabela</button>
+    </div>
+    <div id="us-cards" class="cards">
+        {% for item in overview.us %}
+        <a class="market-card" href="{% url 'stock_detail' item.symbol %}">
+            <div class="symbol">{{ item.symbol }}</div>
+            <div class="name">{{ item.name }}</div>
+            <div class="price">{{ item.currency }} {{ item.price }}</div>
+            <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
+        </a>
+        {% empty %}<p class="loading">A carregar...</p>{% endfor %}
+    </div>
+    <table id="us-table" style="display:none">
+        <tr><th>Símbolo</th><th>Nome</th><th>Preço</th><th>Variação</th></tr>
+        {% for item in overview.us %}
+        <tr>
+            <td><a href="{% url 'stock_detail' item.symbol %}">{{ item.symbol }}</a></td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.currency }} {{ item.price }}</td>
+            <td class="{% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div id="section-br" class="section">
+    <div class="section-title">🇧🇷 Ações Brasil</div>
+    <div class="view-toggle">
+        <button class="view-btn active" onclick="setView('br','cards',this)">⊞ Cards</button>
+        <button class="view-btn" onclick="setView('br','table',this)">☰ Tabela</button>
+    </div>
+    <div id="br-cards" class="cards">
+        {% for item in overview.br %}
+        <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <div class="symbol">{{ item.symbol }}</div>
+            <div class="name">{{ item.name }}</div>
+            <div class="price">R$ {{ item.price }}</div>
+            <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
+        </a>
+        {% empty %}<p class="loading">A carregar...</p>{% endfor %}
+    </div>
+    <table id="br-table" style="display:none">
+        <tr><th>Símbolo</th><th>Nome</th><th>Preço</th><th>Variação</th></tr>
+        {% for item in overview.br %}
+        <tr>
+            <td><a href="{% url 'stock_detail' item.symbol_yf %}">{{ item.symbol }}</a></td>
+            <td>{{ item.name }}</td>
+            <td>R$ {{ item.price }}</td>
+            <td class="{% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div id="section-fii" class="section">
+    <div class="section-title">🏢 Fundos Imobiliários</div>
+    <div class="view-toggle">
+        <button class="view-btn active" onclick="setView('fii','cards',this)">⊞ Cards</button>
+        <button class="view-btn" onclick="setView('fii','table',this)">☰ Tabela</button>
+    </div>
+    <div id="fii-cards" class="cards">
+        {% for item in overview.fii %}
+        <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <div class="symbol">{{ item.symbol }}</div>
+            <div class="name">{{ item.name }}</div>
+            <div class="price">R$ {{ item.price }}</div>
+            <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
+        </a>
+        {% empty %}<p class="loading">A carregar...</p>{% endfor %}
+    </div>
+    <table id="fii-table" style="display:none">
+        <tr><th>Símbolo</th><th>Nome</th><th>Preço</th><th>Variação</th></tr>
+        {% for item in overview.fii %}
+        <tr>
+            <td><a href="{% url 'stock_detail' item.symbol_yf %}">{{ item.symbol }}</a></td>
+            <td>{{ item.name }}</td>
+            <td>R$ {{ item.price }}</td>
+            <td class="{% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div id="section-crypto" class="section">
+    <div class="section-title">₿ Criptomoedas</div>
+    <div class="view-toggle">
+        <button class="view-btn active" onclick="setView('crypto','cards',this)">⊞ Cards</button>
+        <button class="view-btn" onclick="setView('crypto','table',this)">☰ Tabela</button>
+    </div>
+    <div id="crypto-cards" class="cards">
+        {% for item in overview.crypto %}
+        <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <div class="symbol">{{ item.symbol }}</div>
+            <div class="name">{{ item.name }}</div>
+            <div class="price">USD {{ item.price }}</div>
+            <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
+        </a>
+        {% empty %}<p class="loading">A carregar...</p>{% endfor %}
+    </div>
+    <table id="crypto-table" style="display:none">
+        <tr><th>Símbolo</th><th>Nome</th><th>Preço (USD)</th><th>Variação</th></tr>
+        {% for item in overview.crypto %}
+        <tr>
+            <td><a href="{% url 'stock_detail' item.symbol_yf %}">{{ item.symbol }}</a></td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.price }}</td>
+            <td class="{% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
 <script>
 function showSection(id,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));document.getElementById('section-'+id).classList.add('active');btn.classList.add('active');}
 function setView(prefix,view,btn){const c=document.getElementById(prefix+'-cards');const t=document.getElementById(prefix+'-table');if(view==='cards'){c.style.display='grid';t.style.display='none';}else{c.style.display='none';t.style.display='table';}btn.closest('.view-toggle').querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
-function toggleDark(){const d=document.body.classList.toggle('dark');localStorage.setItem('trt-dark',d);document.getElementById('dark-btn').textContent=d?'☀️':'🌙';}
-(function(){if(localStorage.getItem('trt-dark')==='true'){document.body.classList.add('dark');document.addEventListener('DOMContentLoaded',function(){const b=document.getElementById('dark-btn');if(b)b.textContent='☀️';});}})();
 </script>
-</body>
-</html>
+{% endblock %}
