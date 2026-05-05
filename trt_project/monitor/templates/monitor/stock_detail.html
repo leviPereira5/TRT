@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>TRT — {{ stats.name }}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:sans-serif;background:#f4f6f9;color:#222}
+        header{background:#1a2b4a;color:#fff;padding:16px 32px;display:flex;align-items:center;gap:24px}
+        header h1{font-size:22px;cursor:pointer}
+        header form{flex:1;max-width:320px;margin-left:24px}
+        header form input{width:100%;padding:8px 12px;border:none;border-radius:6px;font-size:14px}
+        nav a{color:#aac4e8;text-decoration:none;margin-left:20px;font-size:14px}
+        nav a:hover{color:#fff}
+        .container{max-width:1000px;margin:32px auto;padding:0 20px}
+        .breadcrumb{font-size:13px;color:#888;margin-bottom:16px}
+        .breadcrumb a{color:#1a2b4a;text-decoration:none}
+
+        /* Hero */
+        .hero{background:#1a2b4a;color:#fff;border-radius:12px;padding:28px 32px;margin-bottom:20px}
+        .hero-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px}
+        .hero-symbol{font-size:32px;font-weight:700}
+        .hero-name{font-size:14px;color:#aac4e8;margin-top:4px}
+        .hero-price{font-size:44px;font-weight:700;margin-top:12px}
+        .hero-change{font-size:18px;font-weight:600;margin-top:6px}
+        .up{color:#4caf82} .down{color:#e05c5c}
+        .hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+        .btn{padding:10px 20px;border:none;border-radius:7px;cursor:pointer;font-size:14px;font-weight:600}
+        .btn-add{background:#1a7a4a;color:#fff}
+        .btn-remove{background:#c0392b;color:#fff}
+        .btn-toggle{background:#e67e22;color:#fff}
+        .btn-monitor{background:#2c4a7a;color:#fff}
+
+        /* Stats grid */
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+        .stat-card{background:#fff;border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+        .stat-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+        .stat-value{font-size:20px;font-weight:700;color:#1a2b4a}
+        .stat-sub{font-size:12px;color:#aaa;margin-top:2px}
+
+        /* Chart */
+        .chart-card{background:#fff;border-radius:10px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:20px}
+        .chart-title{font-size:15px;font-weight:700;color:#1a2b4a;margin-bottom:16px;border-left:4px solid #1a7a4a;padding-left:10px}
+        canvas{width:100%!important}
+
+        /* Alerts & Prices */
+        .card{background:#fff;border-radius:10px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:20px}
+        .section-title{font-size:15px;font-weight:700;color:#1a2b4a;margin:0 0 14px;border-left:4px solid #1a7a4a;padding-left:10px}
+        table{width:100%;border-collapse:collapse}
+        th,td{padding:9px 12px;border-bottom:1px solid #eee;text-align:left;font-size:13px}
+        th{background:#f5f7fa;color:#555}
+        .badge-high{background:#d4edda;color:#155724;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600}
+        .badge-low{background:#f8d7da;color:#721c24;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600}
+        .status-active{color:#1a7a4a;font-weight:600}
+        .status-paused{color:#aaa}
+        .msg-success{background:#d4edda;color:#155724;padding:10px;border-radius:6px;margin-bottom:12px}
+        .msg-error{background:#f8d7da;color:#721c24;padding:10px;border-radius:6px;margin-bottom:12px}
+        .alert-box{background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:8px;padding:14px 18px;margin-bottom:20px;font-size:14px}
+    </style>
+</head>
+<body>
+<header>
+    <h1 onclick="window.location='{% url 'home' %}'">TRT Invest</h1>
+    <form method="get" action="{% url 'search' %}">
+        <input type="text" name="q" placeholder="Pesquisar ativo...">
+    </form>
+    <nav>
+        <a href="{% url 'home' %}">Início</a>
+        <a href="{% url 'stock_list' %}">Meu Portfolio</a>
+        <a href="{% url 'alert_history' %}">Alertas</a>
+        <a href="{% url 'settings' %}">Configurações</a>
+    </nav>
+</header>
+
+<div class="container">
+
+    <div class="breadcrumb">
+        <a href="{% url 'home' %}">Início</a> &rsaquo;
+        <a href="{% url 'stock_list' %}">Portfolio</a> &rsaquo;
+        {{ symbol }}
+    </div>
+
+    {% for msg in messages %}
+        <div class="msg-{{ msg.tags }}">{{ msg }}</div>
+    {% endfor %}
+
+    <!-- Hero -->
+    <div class="hero">
+        <div class="hero-top">
+            <div>
+                <div class="hero-symbol">{{ symbol|cut:".SA" }}</div>
+                <div class="hero-name">{{ stats.name }}</div>
+            </div>
+            {% if stock %}
+            <div style="text-align:right">
+                <div style="font-size:13px;color:#aac4e8">Monitorização</div>
+                {% if stock.is_active %}
+                    <span class="status-active">● Ativa</span>
+                {% else %}
+                    <span class="status-paused">● Pausada</span>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="hero-price">{{ stats.currency }} {{ stats.price }}</div>
+        <div class="hero-change {% if stats.change_pct >= 0 %}up{% else %}down{% endif %}">
+            {% if stats.change_pct >= 0 %}▲{% else %}▼{% endif %}
+            {{ stats.change_pct }}% hoje
+        </div>
+
+        <div class="hero-actions">
+            {% if stock %}
+                <form method="post" style="display:inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="toggle">
+                    <button class="btn btn-toggle">
+                        {% if stock.is_active %}Pausar monitorização{% else %}Ativar monitorização{% endif %}
+                    </button>
+                </form>
+                <form method="post" style="display:inline"
+                      onsubmit="return confirm('Remover da monitorização?')">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="remove">
+                    <button class="btn btn-remove">Remover</button>
+                </form>
+                <form method="post" action="{% url 'run_monitor' %}" style="display:inline">
+                    {% csrf_token %}
+                    <button class="btn btn-monitor">▶ Monitorizar agora</button>
+                </form>
+            {% else %}
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add">
+                    <button class="btn btn-add">+ Adicionar à monitorização</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Mín. 52 semanas</div>
+            <div class="stat-value">{{ stats.week52_low }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Máx. 52 semanas</div>
+            <div class="stat-value">{{ stats.week52_high }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Mín. hoje</div>
+            <div class="stat-value">{{ stats.day_low }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Máx. hoje</div>
+            <div class="stat-value">{{ stats.day_high }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Dividend Yield</div>
+            <div class="stat-value">{% if stats.div_yield != '—' %}{{ stats.div_yield }}%{% else %}—{% endif %}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">P/E Ratio</div>
+            <div class="stat-value">{{ stats.pe_ratio }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Volume</div>
+            <div class="stat-value" style="font-size:15px">{{ stats.volume }}</div>
+        </div>
+    </div>
+
+    <!-- Gráfico -->
+    {% if chart_data %}
+    <div class="chart-card">
+        <div class="chart-title">Cotação — últimos 30 dias</div>
+        <canvas id="priceChart" height="80"></canvas>
+    </div>
+    {% endif %}
+
+    <!-- Configurações de alerta -->
+    {% if stock %}
+    <div class="card">
+        <div class="section-title">Configurações de alerta</div>
+        <p style="font-size:13px;color:#888;margin-bottom:12px">
+            Alta ≥ <strong>{{ settings.alert_threshold_high }}%</strong> &nbsp;|&nbsp;
+            Baixa ≥ <strong>{{ settings.alert_threshold_low }}%</strong> &nbsp;|&nbsp;
+            Email: <strong>{{ settings.alert_email|default:"não configurado" }}</strong>
+        </p>
+        <a href="{% url 'settings' %}" class="btn btn-monitor"
+           style="text-decoration:none;display:inline-block">
+            Editar configurações globais
+        </a>
+    </div>
+
+    <!-- Histórico de alertas -->
+    {% if alerts %}
+    <div class="card">
+        <div class="section-title">Últimos alertas</div>
+        <table>
+            <tr><th>Data/Hora</th><th>Direção</th><th>Variação</th><th>Preço</th><th>Email</th></tr>
+            {% for alert in alerts %}
+            <tr>
+                <td>{{ alert.sent_at|date:"d/m/Y H:i" }}</td>
+                <td>
+                    {% if alert.direction == 'high' %}
+                        <span class="badge-high">⬆ Alta</span>
+                    {% else %}
+                        <span class="badge-low">⬇ Baixa</span>
+                    {% endif %}
+                </td>
+                <td>{{ alert.variation }}%</td>
+                <td>{{ alert.price }}</td>
+                <td>{% if alert.email_sent %}✅{% else %}—{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Histórico de preços -->
+    {% if prices %}
+    <div class="card">
+        <div class="section-title">Histórico de preços registados</div>
+        <table>
+            <tr><th>Data/Hora</th><th>Preço</th></tr>
+            {% for p in prices %}
+            <tr>
+                <td>{{ p.fetched_at|date:"d/m/Y H:i:s" }}</td>
+                <td>{{ p.price }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+    {% endif %}
+
+</div>
+
+{% if chart_data %}
+<script>
+const labels = {{ chart_labels|safe }};
+const data   = {{ chart_data|safe }};
+const up     = data[data.length-1] >= data[0];
+const color  = up ? '#1a7a4a' : '#c0392b';
+
+new Chart(document.getElementById('priceChart'), {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Preço de fecho',
+            data: data,
+            borderColor: color,
+            backgroundColor: up ? 'rgba(26,122,74,.10)' : 'rgba(192,57,43,.10)',
+            borderWidth: 2,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+            fill: true,
+            tension: 0.3,
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+            x: { grid: { display: false }, ticks: { maxTicksLimit: 8 } },
+            y: { grid: { color: '#f0f0f0' } }
+        }
+    }
+});
+</script>
+{% endif %}
+
+</body>
+</html>

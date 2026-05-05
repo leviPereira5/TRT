@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>TRT Invest</title>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:sans-serif;background:#f4f6f9;color:#222}
+        header{background:#1a2b4a;color:#fff;padding:16px 32px;display:flex;align-items:center;gap:24px}
+        header h1{font-size:22px;letter-spacing:1px}
+        nav a{color:#aac4e8;text-decoration:none;margin-left:20px;font-size:14px}
+        nav a:hover{color:#fff}
+        .container{max-width:1200px;margin:32px auto;padding:0 20px}
+        .section-title{font-size:18px;font-weight:700;color:#1a2b4a;margin:32px 0 12px;border-left:4px solid #1a7a4a;padding-left:10px}
+        .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+        .card{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);cursor:pointer;transition:box-shadow .2s;text-decoration:none;color:inherit;display:block}
+        .card:hover{box-shadow:0 4px 16px rgba(0,0,0,.13)}
+        .card .symbol{font-size:15px;font-weight:700;color:#1a2b4a}
+        .card .name{font-size:11px;color:#888;margin:2px 0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .card .price{font-size:18px;font-weight:700}
+        .card .change{font-size:13px;font-weight:600;margin-top:4px}
+        .up{color:#1a7a4a} .down{color:#c0392b}
+        .loading{color:#888;font-size:14px;padding:20px 0}
+    </style>
+</head>
+<body>
+<header>
+    <h1>TRT Invest</h1>
+    <form method="get" action="/search/" style="flex:1;max-width:320px;margin-left:24px">
+        <input type="text" name="q" placeholder="Pesquisar ativo..."
+               style="width:100%;padding:8px 12px;border:none;border-radius:6px;font-size:14px">
+    </form>
+    <nav>
+        <a href="{% url 'home' %}">Início</a>
+        <a href="{% url 'stock_list' %}">Meu Portfolio</a>
+        <a href="{% url 'alert_history' %}">Alertas</a>
+        <a href="{% url 'settings' %}">Configurações</a>
+    </nav>
+</header>
+
+<div class="container">
+
+    <div class="section-title">🇺🇸 Ações EUA</div>
+    <div class="cards">
+        {% for item in overview.us %}
+        <a class="card" href="{% url 'stock_detail' item.symbol %}">
+            <div class="symbol">{{ item.symbol }}</div>
+            <div class="name">{{ item.name }}</div>
+            <div class="price">{{ item.currency }} {{ item.price }}</div>
+            <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">
+                {% if item.change_pct >= 0 %}▲{% else %}▼{% endif %}
+                {{ item.change_pct }}%
+            </div>
+        </a>
+        {% empty %}
+            <p class="loading">A carregar dados...</p>
+        {% endfor %}
+    </div>
+
+    <div class="section-title">🇧🇷 Ações Brasil</div>
+    <div class="cards">
+        {% for item in overview.br %}
+        <a class="card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <div class="symbol">{{ item.symbol }}</div>
+            <div class="name">{{ item.name }}</div>
+            <div class="price">R$ {{ item.price }}</div>
+            <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">
+                {% if item.change_pct >= 0 %}▲{% else %}▼{% endif %}
+                {{ item.change_pct }}%
+            </div>
+        </a>
+        {% empty %}
+            <p class="loading">A carregar dados...</p>
+        {% endfor %}
+    </div>
+
+    <div class="section-title">🏢 Fundos Imobiliários</div>
+    <div class="cards">
+        {% for item in overview.fii %}
+        <a class="card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <div class="symbol">{{ item.symbol }}</div>
+            <div class="name">{{ item.name }}</div>
+            <div class="price">R$ {{ item.price }}</div>
+            <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">
+                {% if item.change_pct >= 0 %}▲{% else %}▼{% endif %}
+                {{ item.change_pct }}%
+            </div>
+        </a>
+        {% empty %}
+            <p class="loading">A carregar dados...</p>
+        {% endfor %}
+    </div>
+
+</div>
+</body>
+</html>

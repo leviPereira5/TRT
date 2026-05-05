@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>TRT — Histórico de Alertas</title>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0}
+        body{font-family:sans-serif;background:#f4f6f9;color:#222}
+        header{background:#1a2b4a;color:#fff;padding:16px 32px;display:flex;align-items:center;gap:24px}
+        header h1{font-size:22px}
+        nav a{color:#aac4e8;text-decoration:none;margin-left:20px;font-size:14px}
+        nav a:hover{color:#fff}
+        .container{max-width:1000px;margin:32px auto;padding:0 20px}
+        .card{background:#fff;border-radius:10px;padding:24px;box-shadow:0 1px 6px rgba(0,0,0,.09)}
+        .section-title{font-size:16px;font-weight:700;color:#1a2b4a;margin:0 0 16px;border-left:4px solid #1a7a4a;padding-left:10px}
+        table{width:100%;border-collapse:collapse}
+        th,td{padding:10px 14px;border-bottom:1px solid #eee;text-align:left;font-size:14px}
+        th{background:#f5f7fa;color:#555}
+        .badge-high{background:#d4edda;color:#155724;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600}
+        .badge-low{background:#f8d7da;color:#721c24;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:600}
+        a{color:#1a2b4a;font-weight:700;text-decoration:none}
+        a:hover{text-decoration:underline}
+    </style>
+</head>
+<body>
+<header>
+    <h1>TRT Invest</h1>
+    <form method="get" action="/search/" style="flex:1;max-width:320px;margin-left:24px">
+        <input type="text" name="q" placeholder="Pesquisar ativo..."
+               style="width:100%;padding:8px 12px;border:none;border-radius:6px;font-size:14px">
+    </form>
+    <nav>
+        <a href="{% url 'home' %}">Início</a>
+        <a href="{% url 'stock_list' %}">Meu Portfolio</a>
+        <a href="{% url 'alert_history' %}">Alertas</a>
+        <a href="{% url 'settings' %}">Configurações</a>
+    </nav>
+</header>
+
+<div class="container">
+    <div class="card">
+        <div class="section-title">Histórico de Alertas</div>
+        {% if alerts %}
+        <table>
+            <tr><th>Data/Hora</th><th>Ativo</th><th>Direção</th><th>Variação</th><th>Preço</th><th>Email</th></tr>
+            {% for alert in alerts %}
+            <tr>
+                <td>{{ alert.sent_at|date:"d/m/Y H:i:s" }}</td>
+                <td>
+                    <a href="{% url 'stock_detail' alert.stock.symbol %}">
+                        {{ alert.stock.symbol|cut:".SA" }}
+                    </a>
+                </td>
+                <td>
+                    {% if alert.direction == 'high' %}
+                        <span class="badge-high">⬆ Alta</span>
+                    {% else %}
+                        <span class="badge-low">⬇ Baixa</span>
+                    {% endif %}
+                </td>
+                <td>{{ alert.variation }}%</td>
+                <td>{{ alert.price }}</td>
+                <td>{% if alert.email_sent %}✅ Enviado{% else %}—{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            <p style="color:#aaa">Nenhum alerta gerado ainda.</p>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>
