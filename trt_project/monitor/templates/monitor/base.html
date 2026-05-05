@@ -19,7 +19,28 @@
         <a href="{% url 'alert_history' %}">Alertas</a>
         <a href="{% url 'settings' %}">Configurações</a>
     </nav>
-    <button class="dark-btn" onclick="toggleDark()" id="dark-btn">🌙</button>
+
+    <div class="theme-toggle" onclick="toggleDark()" title="Alternar modo escuro">
+        <div class="toggle-track">
+            <!-- Sol -->
+            <svg class="toggle-icon sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"/>
+                <line x1="12" y1="2" x2="12" y2="5"/>
+                <line x1="12" y1="19" x2="12" y2="22"/>
+                <line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/>
+                <line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/>
+                <line x1="2" y1="12" x2="5" y2="12"/>
+                <line x1="19" y1="12" x2="22" y2="12"/>
+                <line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/>
+                <line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/>
+            </svg>
+            <!-- Lua -->
+            <svg class="toggle-icon moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z"/>
+            </svg>
+            <div class="toggle-thumb" id="toggle-thumb"></div>
+        </div>
+    </div>
 </header>
 
 {% block filter_bar %}{% endblock %}
@@ -35,17 +56,18 @@
 
 <script>
 function toggleDark() {
-    const d = document.body.classList.toggle('dark');
-    localStorage.setItem('trt-dark', d);
-    document.getElementById('dark-btn').textContent = d ? '☀️' : '🌙';
+    const isDark = document.body.classList.toggle('dark');
+    localStorage.setItem('trt-dark', isDark);
+    updateToggle(isDark);
+}
+function updateToggle(isDark) {
+    const thumb = document.getElementById('toggle-thumb');
+    if (thumb) thumb.style.transform = isDark ? 'translateX(28px)' : 'translateX(0px)';
 }
 (function() {
     if (localStorage.getItem('trt-dark') === 'true') {
         document.body.classList.add('dark');
-        document.addEventListener('DOMContentLoaded', function() {
-            const b = document.getElementById('dark-btn');
-            if (b) b.textContent = '☀️';
-        });
+        document.addEventListener('DOMContentLoaded', function() { updateToggle(true); });
     }
 })();
 </script>
