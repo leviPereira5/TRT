@@ -5,17 +5,21 @@
     <title>TRT — Meu Portfolio</title>
     <style>
         *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:sans-serif;background:#f4f6f9;color:#222}
-        header{background:#1a2b4a;color:#fff;padding:16px 32px;display:flex;align-items:center;gap:24px}
-        header h1{font-size:22px}
-        nav a{color:#aac4e8;text-decoration:none;margin-left:20px;font-size:14px}
-        nav a:hover{color:#fff}
+        body{font-family:sans-serif;background:#f4f6f9;color:#222;transition:background .3s,color .3s}
+        header{background:#1a2b4a;color:#fff;padding:14px 32px;display:flex;align-items:center;gap:16px}
+        header h1{font-size:22px;cursor:pointer;white-space:nowrap}
+        header form{flex:1;max-width:320px}
+        header form input{width:100%;padding:8px 12px;border:none;border-radius:6px;font-size:14px}
+        .header-nav a{color:#aac4e8;text-decoration:none;margin-left:16px;font-size:14px}
+        .header-nav a:hover{color:#fff}
+        .dark-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:14px;margin-left:8px}
         .container{max-width:1000px;margin:32px auto;padding:0 20px}
         .card{background:#fff;border-radius:10px;padding:24px;box-shadow:0 1px 6px rgba(0,0,0,.09);margin-bottom:24px}
-        .section-title{font-size:16px;font-weight:700;color:#1a2b4a;margin:0 0 16px;border-left:4px solid #1a7a4a;padding-left:10px}
+        .section-title{font-size:16px;font-weight:700;color:#1a2b4a;margin:0 0 16px;border-left:4px solid #17a589;padding-left:10px}
         table{width:100%;border-collapse:collapse}
         th,td{padding:10px 14px;border-bottom:1px solid #eee;text-align:left;font-size:14px}
         th{background:#f5f7fa;color:#555}
+        tr:hover td{background:#f9fafb}
         .btn{padding:7px 14px;border:none;border-radius:5px;cursor:pointer;font-size:13px;font-weight:600;margin-right:4px}
         .btn-add{background:#1a7a4a;color:#fff}
         .btn-remove{background:#c0392b;color:#fff}
@@ -31,25 +35,38 @@
         .badge-us{background:#e8f0fe;color:#1a3a8a}
         .badge-br{background:#e6f4ea;color:#1a5c2a}
         .badge-fii{background:#fef3e2;color:#7a4a00}
+        .badge-crypto{background:#f3e8ff;color:#5a1a8a}
+        body.dark{background:#0f1117;color:#e0e0e0}
+        body.dark header{background:#0a0f1e}
+        body.dark .card{background:#1a1f2e;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+        body.dark .section-title{color:#aac4e8}
+        body.dark th{background:#12172a;color:#aaa}
+        body.dark td{border-bottom-color:#2a2f3e}
+        body.dark tr:hover td{background:#1f2535}
+        body.dark input[type=text],body.dark select{background:#1a1f2e;color:#e0e0e0;border-color:#2a2f3e}
+        body.dark .msg-success{background:#0d3320;color:#4caf82}
+        body.dark .msg-error{background:#3a0f0f;color:#e05c5c}
+        body.dark .msg-warning{background:#3a2f00;color:#f0c040}
+        body.dark .status-active{color:#4caf82}
+        body.dark .btn-monitor{background:#2c4a7a}
     </style>
 </head>
 <body>
 <header>
-    <h1>TRT Invest</h1>
-    <form method="get" action="/search/" style="flex:1;max-width:320px;margin-left:24px">
-        <input type="text" name="q" placeholder="Pesquisar ativo..."
-               style="width:100%;padding:8px 12px;border:none;border-radius:6px;font-size:14px">
+    <h1 onclick="window.location='/'">TRT Invest</h1>
+    <form method="get" action="/search/">
+        <input type="text" name="q" placeholder="🔍  Pesquisar ativo...">
     </form>
-    <nav>
+    <nav class="header-nav">
         <a href="{% url 'home' %}">Início</a>
         <a href="{% url 'stock_list' %}">Meu Portfolio</a>
         <a href="{% url 'alert_history' %}">Alertas</a>
         <a href="{% url 'settings' %}">Configurações</a>
     </nav>
+    <button class="dark-btn" onclick="toggleDark()" id="dark-btn">🌙</button>
 </header>
 
 <div class="container">
-
     {% for msg in messages %}
         <div class="msg-{{ msg.tags }}">{{ msg }}</div>
     {% endfor %}
@@ -58,12 +75,13 @@
         <div class="section-title">Adicionar ativo manualmente</div>
         <form method="post" action="{% url 'stock_add' %}">
             {% csrf_token %}
-            <input type="text" name="symbol" placeholder="Ex: AAPL ou PETR4" required>
+            <input type="text" name="symbol" placeholder="Ex: AAPL, PETR4, BTC-USD" required>
             <input type="text" name="name" placeholder="Nome (opcional)">
             <select name="tipo">
                 <option value="stock_us">Ação EUA</option>
                 <option value="stock_br">Ação Brasil</option>
                 <option value="fii">Fundo Imobiliário</option>
+                <option value="crypto">Criptomoeda</option>
             </select>
             <button class="btn btn-add" type="submit">+ Adicionar</button>
         </form>
@@ -71,24 +89,26 @@
 
     <div class="card">
         <div class="section-title">Ativos monitorizados</div>
-
         <form method="post" action="{% url 'run_monitor' %}" style="margin-bottom:16px">
             {% csrf_token %}
             <button class="btn btn-monitor" type="submit">▶ Correr monitorização agora</button>
         </form>
-
         {% if stocks_data %}
         <table>
             <tr>
-                <th>Símbolo</th><th>Nome</th><th>Tipo</th>
-                <th>Último preço</th><th>Estado</th><th>Ações</th>
+                <th>Símbolo</th>
+                <th>Nome</th>
+                <th>Tipo</th>
+                <th>Último preço</th>
+                <th>Estado</th>
+                <th>Ações</th>
             </tr>
             {% for item in stocks_data %}
             <tr>
                 <td>
                     <a href="{% url 'stock_detail' item.stock.symbol %}"
                        style="font-weight:700;color:#1a2b4a;text-decoration:none">
-                        {{ item.stock.symbol|slice:":-3"|default:item.stock.symbol }}
+                        {{ item.stock.display_symbol }}
                     </a>
                 </td>
                 <td>{{ item.stock.name|default:"—" }}</td>
@@ -97,15 +117,19 @@
                         <span class="badge badge-us">EUA</span>
                     {% elif item.stock.tipo == 'stock_br' %}
                         <span class="badge badge-br">Brasil</span>
-                    {% else %}
+                    {% elif item.stock.tipo == 'fii' %}
                         <span class="badge badge-fii">FII</span>
+                    {% elif item.stock.tipo == 'crypto' %}
+                        <span class="badge badge-crypto">Cripto</span>
                     {% endif %}
                 </td>
                 <td>
                     {% if item.last_price %}
                         <strong>{{ item.last_price }}</strong>
                         <small style="color:#aaa"> @ {{ item.last_fetched|date:"H:i" }}</small>
-                    {% else %}—{% endif %}
+                    {% else %}
+                        —
+                    {% endif %}
                 </td>
                 <td>
                     {% if item.stock.is_active %}
@@ -133,7 +157,10 @@
             {% endfor %}
         </table>
         {% else %}
-            <p style="color:#aaa">Nenhum ativo adicionado. Vai ao <a href="{% url 'home' %}">início</a> para explorar.</p>
+            <p style="color:#aaa">
+                Nenhum ativo adicionado. Vai ao
+                <a href="{% url 'home' %}">início</a> para explorar.
+            </p>
         {% endif %}
     </div>
 
@@ -145,7 +172,23 @@
         Email: {{ settings.alert_email|default:"não configurado" }}
     </p>
     {% endif %}
-
 </div>
+
+<script>
+function toggleDark() {
+    const d = document.body.classList.toggle('dark');
+    localStorage.setItem('trt-dark', d);
+    document.getElementById('dark-btn').textContent = d ? '☀️' : '🌙';
+}
+(function() {
+    if (localStorage.getItem('trt-dark') === 'true') {
+        document.body.classList.add('dark');
+        document.addEventListener('DOMContentLoaded', function() {
+            const b = document.getElementById('dark-btn');
+            if (b) b.textContent = '☀️';
+        });
+    }
+})();
+</script>
 </body>
 </html>

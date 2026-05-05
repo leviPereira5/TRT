@@ -5,73 +5,100 @@
     <title>TRT — Pesquisa</title>
     <style>
         *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:sans-serif;background:#f4f6f9;color:#222}
-        header{background:#1a2b4a;color:#fff;padding:16px 32px;display:flex;align-items:center;gap:24px}
-        header h1{font-size:22px}
-        nav a{color:#aac4e8;text-decoration:none;margin-left:20px;font-size:14px}
-        nav a:hover{color:#fff}
-        .container{max-width:800px;margin:32px auto;padding:0 20px}
-        .card{background:#fff;border-radius:10px;padding:24px;box-shadow:0 1px 6px rgba(0,0,0,.09);margin-bottom:16px}
-        .search-bar{display:flex;gap:10px;margin-bottom:24px}
-        .search-bar input{flex:1;padding:12px 16px;border:1px solid #ddd;border-radius:8px;font-size:15px}
-        .search-bar input:focus{outline:none;border-color:#1a2b4a}
-        .search-bar button{padding:12px 24px;background:#1a2b4a;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600}
-        .result-symbol{font-size:22px;font-weight:700;color:#1a2b4a}
-        .result-name{color:#888;font-size:13px;margin:4px 0 12px}
-        .result-price{font-size:28px;font-weight:700}
-        .change{font-size:15px;font-weight:600;margin-top:6px}
-        .up{color:#1a7a4a} .down{color:#c0392b}
-        .btn{display:inline-block;margin-top:16px;padding:10px 22px;background:#1a7a4a;color:#fff;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px}
-        .no-results{color:#aaa;text-align:center;padding:40px 0}
-        .section-title{font-size:16px;font-weight:700;color:#1a2b4a;margin:0 0 16px;border-left:4px solid #1a7a4a;padding-left:10px}
+        body{font-family:sans-serif;background:#f4f6f9;color:#222;transition:background .3s,color .3s}
+        header{background:#1a2b4a;color:#fff;padding:14px 32px;display:flex;align-items:center;gap:16px}
+        header h1{font-size:22px;cursor:pointer;white-space:nowrap}
+        header form.hf{flex:1;max-width:320px}
+        header form.hf input{width:100%;padding:8px 12px;border:none;border-radius:6px;font-size:14px}
+        .header-nav a{color:#aac4e8;text-decoration:none;margin-left:16px;font-size:14px}
+        .header-nav a:hover{color:#fff}
+        .dark-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:14px;margin-left:8px}
+        .container{max-width:900px;margin:32px auto;padding:0 20px}
+        .search-hero{background:#fff;border-radius:12px;padding:28px;box-shadow:0 1px 6px rgba(0,0,0,.09);margin-bottom:24px}
+        .search-hero form{display:flex;gap:10px}
+        .search-hero input{flex:1;padding:13px 18px;border:2px solid #ddd;border-radius:8px;font-size:16px}
+        .search-hero input:focus{outline:none;border-color:#1a2b4a}
+        .search-hero button{padding:13px 28px;background:#1a2b4a;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:15px;font-weight:600}
+        .results-count{font-size:13px;color:#888;margin-bottom:12px}
+        .result-card{background:#fff;border-radius:10px;padding:16px 20px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:16px;text-decoration:none;color:inherit;transition:box-shadow .2s,transform .2s}
+        .result-card:hover{box-shadow:0 4px 14px rgba(0,0,0,.12);transform:translateY(-1px)}
+        .result-symbol{font-size:18px;font-weight:700;color:#1a2b4a}
+        .result-name{font-size:13px;color:#666;margin-top:3px}
+        .result-meta{font-size:11px;color:#aaa;margin-top:4px}
+        .badge-type{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+        .badge-EQUITY{background:#e8f0fe;color:#1a3a8a}
+        .badge-ETF{background:#e6f4ea;color:#1a5c2a}
+        .badge-MUTUALFUND{background:#fef3e2;color:#7a4a00}
+        .badge-CRYPTOCURRENCY{background:#f3e8ff;color:#5a1a8a}
+        .badge-default{background:#f0f0f0;color:#555}
+        .btn-detail{display:inline-block;margin-top:8px;padding:6px 14px;background:#1a7a4a;color:#fff;border-radius:5px;font-size:12px;font-weight:600;text-decoration:none}
+        .no-results{text-align:center;padding:48px 0;color:#aaa}
+        .tip{background:#e8f4fd;border-left:4px solid #1a2b4a;padding:12px 16px;border-radius:6px;font-size:13px;color:#1a2b4a;margin-bottom:20px}
+        body.dark{background:#0f1117;color:#e0e0e0}
+        body.dark header{background:#0a0f1e}
+        body.dark .search-hero{background:#1a1f2e}
+        body.dark .search-hero input{background:#12172a;color:#e0e0e0;border-color:#2a2f3e}
+        body.dark .result-card{background:#1a1f2e;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+        body.dark .result-symbol{color:#aac4e8}
+        body.dark .result-name{color:#aaa}
+        body.dark .tip{background:#12172a;color:#aac4e8;border-color:#aac4e8}
+        body.dark .no-results{color:#666}
     </style>
 </head>
 <body>
 <header>
-    <h1>TRT Invest</h1>
-    <form method="get" action="/search/" style="flex:1;max-width:320px;margin-left:24px">
-        <input type="text" name="q" placeholder="Pesquisar ativo..."
-               style="width:100%;padding:8px 12px;border:none;border-radius:6px;font-size:14px">
+    <h1 onclick="window.location='/'">TRT Invest</h1>
+    <form class="hf" method="get" action="{% url 'search' %}">
+        <input type="text" name="q" value="{{ query }}" placeholder="🔍  Pesquisar ativo...">
     </form>
-    <nav>
+    <nav class="header-nav">
         <a href="{% url 'home' %}">Início</a>
         <a href="{% url 'stock_list' %}">Meu Portfolio</a>
         <a href="{% url 'alert_history' %}">Alertas</a>
         <a href="{% url 'settings' %}">Configurações</a>
     </nav>
+    <button class="dark-btn" onclick="toggleDark()" id="dark-btn">🌙</button>
 </header>
-
 <div class="container">
-    <form method="get" action="{% url 'search' %}" class="search-bar">
-        <input type="text" name="q" value="{{ query }}"
-               placeholder="Pesquisar ativo... ex: AAPL, PETR4, HGLG11" autofocus>
-        <button type="submit">Pesquisar</button>
-    </form>
-
+    <div class="search-hero">
+        <form method="get" action="{% url 'search' %}">
+            <input type="text" name="q" value="{{ query }}" placeholder="Pesquisa por nome ou símbolo... ex: Petrobras, AAPL, Bitcoin" autofocus>
+            <button type="submit">Pesquisar</button>
+        </form>
+    </div>
+    {% if not query %}
+        <div class="tip">💡 Podes pesquisar <strong>qualquer ativo mundial</strong> — ações, ETFs, fundos imobiliários, criptomoedas e mais.</div>
+    {% endif %}
     {% if query %}
         {% if results %}
-            <div class="section-title">Resultados para "{{ query }}"</div>
+            <div class="results-count">{{ results|length }} resultado(s) para "<strong>{{ query }}</strong>"</div>
             {% for item in results %}
-            <div class="card">
-                <div class="result-symbol">{{ item.symbol }}</div>
-                <div class="result-name">{{ item.name }}</div>
-                <div class="result-price">{{ item.currency }} {{ item.price }}</div>
-                <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">
-                    {% if item.change_pct >= 0 %}▲{% else %}▼{% endif %}
-                    {{ item.change_pct }}%
+            <a class="result-card" href="{% url 'stock_detail' item.symbol %}">
+                <div>
+                    <div class="result-symbol">{{ item.symbol }}</div>
+                    <div class="result-name">{{ item.name }}</div>
+                    <div class="result-meta">Bolsa: {{ item.exchange }}{% if item.currency %} · {{ item.currency }}{% endif %}</div>
                 </div>
-                <a class="btn" href="{% url 'stock_detail' item.symbol %}">
-                    Ver detalhes / Adicionar à monitorização
-                </a>
-            </div>
+                <div style="text-align:right">
+                    <span class="badge-type badge-{{ item.tipo|default:'default' }}">
+                        {% if item.tipo == 'EQUITY' %}Ação{% elif item.tipo == 'ETF' %}ETF{% elif item.tipo == 'MUTUALFUND' %}Fundo{% elif item.tipo == 'CRYPTOCURRENCY' %}Cripto{% else %}{{ item.tipo|default:"—" }}{% endif %}
+                    </span>
+                    <br>
+                    <span class="btn-detail">Ver detalhes →</span>
+                </div>
+            </a>
             {% endfor %}
         {% else %}
             <div class="no-results">
-                <p>Nenhum resultado para "<strong>{{ query }}</strong>".</p>
-                <p style="margin-top:8px;font-size:13px">Tenta o símbolo exato: AAPL, PETR4.SA, HGLG11.SA</p>
+                <p>Nenhum resultado para "<strong>{{ query }}</strong>"</p>
+                <small>Tenta o símbolo exato: AAPL, PETR4, HGLG11, BTC-USD</small>
             </div>
         {% endif %}
     {% endif %}
 </div>
+<script>
+function toggleDark(){const d=document.body.classList.toggle('dark');localStorage.setItem('trt-dark',d);document.getElementById('dark-btn').textContent=d?'☀️':'🌙';}
+(function(){if(localStorage.getItem('trt-dark')==='true'){document.body.classList.add('dark');document.addEventListener('DOMContentLoaded',function(){const b=document.getElementById('dark-btn');if(b)b.textContent='☀️';});}})();
+</script>
 </body>
 </html>

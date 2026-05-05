@@ -6,18 +6,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <style>
         *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:sans-serif;background:#f4f6f9;color:#222}
-        header{background:#1a2b4a;color:#fff;padding:16px 32px;display:flex;align-items:center;gap:24px}
-        header h1{font-size:22px;cursor:pointer}
-        header form{flex:1;max-width:320px;margin-left:24px}
+        body{font-family:sans-serif;background:#f4f6f9;color:#222;transition:background .3s,color .3s}
+        header{background:#1a2b4a;color:#fff;padding:14px 32px;display:flex;align-items:center;gap:16px}
+        header h1{font-size:22px;cursor:pointer;white-space:nowrap}
+        header form{flex:1;max-width:320px}
         header form input{width:100%;padding:8px 12px;border:none;border-radius:6px;font-size:14px}
-        nav a{color:#aac4e8;text-decoration:none;margin-left:20px;font-size:14px}
-        nav a:hover{color:#fff}
+        .header-nav a{color:#aac4e8;text-decoration:none;margin-left:16px;font-size:14px}
+        .header-nav a:hover{color:#fff}
+        .dark-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:14px;margin-left:8px}
         .container{max-width:1000px;margin:32px auto;padding:0 20px}
         .breadcrumb{font-size:13px;color:#888;margin-bottom:16px}
         .breadcrumb a{color:#1a2b4a;text-decoration:none}
-
-        /* Hero */
         .hero{background:#1a2b4a;color:#fff;border-radius:12px;padding:28px 32px;margin-bottom:20px}
         .hero-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px}
         .hero-symbol{font-size:32px;font-weight:700}
@@ -31,50 +30,63 @@
         .btn-remove{background:#c0392b;color:#fff}
         .btn-toggle{background:#e67e22;color:#fff}
         .btn-monitor{background:#2c4a7a;color:#fff}
-
-        /* Stats grid */
         .stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
         .stat-card{background:#fff;border-radius:10px;padding:16px 18px;box-shadow:0 1px 4px rgba(0,0,0,.07)}
         .stat-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
         .stat-value{font-size:20px;font-weight:700;color:#1a2b4a}
-        .stat-sub{font-size:12px;color:#aaa;margin-top:2px}
-
-        /* Chart */
         .chart-card{background:#fff;border-radius:10px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:20px}
-        .chart-title{font-size:15px;font-weight:700;color:#1a2b4a;margin-bottom:16px;border-left:4px solid #1a7a4a;padding-left:10px}
+        .chart-title{font-size:15px;font-weight:700;color:#1a2b4a;margin-bottom:16px;border-left:4px solid #17a589;padding-left:10px}
         canvas{width:100%!important}
-
-        /* Alerts & Prices */
         .card{background:#fff;border-radius:10px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:20px}
-        .section-title{font-size:15px;font-weight:700;color:#1a2b4a;margin:0 0 14px;border-left:4px solid #1a7a4a;padding-left:10px}
+        .section-title{font-size:15px;font-weight:700;color:#1a2b4a;margin:0 0 14px;border-left:4px solid #17a589;padding-left:10px}
         table{width:100%;border-collapse:collapse}
         th,td{padding:9px 12px;border-bottom:1px solid #eee;text-align:left;font-size:13px}
         th{background:#f5f7fa;color:#555}
+        tr:hover td{background:#f9fafb}
         .badge-high{background:#d4edda;color:#155724;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600}
         .badge-low{background:#f8d7da;color:#721c24;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600}
-        .status-active{color:#1a7a4a;font-weight:600}
+        .status-active{color:#4caf82;font-weight:600}
         .status-paused{color:#aaa}
         .msg-success{background:#d4edda;color:#155724;padding:10px;border-radius:6px;margin-bottom:12px}
         .msg-error{background:#f8d7da;color:#721c24;padding:10px;border-radius:6px;margin-bottom:12px}
-        .alert-box{background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:8px;padding:14px 18px;margin-bottom:20px;font-size:14px}
+
+        /* Dark mode */
+        body.dark{background:#0f1117;color:#e0e0e0}
+        body.dark header{background:#0a0f1e}
+        body.dark .breadcrumb{color:#666}
+        body.dark .breadcrumb a{color:#aac4e8}
+        body.dark .hero{background:#0a0f1e}
+        body.dark .stat-card{background:#1a1f2e;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+        body.dark .stat-label{color:#666}
+        body.dark .stat-value{color:#aac4e8}
+        body.dark .chart-card{background:#1a1f2e}
+        body.dark .chart-title{color:#aac4e8}
+        body.dark .card{background:#1a1f2e;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+        body.dark .section-title{color:#aac4e8}
+        body.dark th{background:#12172a;color:#aaa}
+        body.dark td{border-bottom-color:#2a2f3e}
+        body.dark tr:hover td{background:#1f2535}
+        body.dark .msg-success{background:#0d3320;color:#4caf82}
+        body.dark .msg-error{background:#3a0f0f;color:#e05c5c}
+        body.dark .btn-monitor{background:#1a3a6a}
     </style>
 </head>
 <body>
 <header>
-    <h1 onclick="window.location='{% url 'home' %}'">TRT Invest</h1>
+    <h1 onclick="window.location='/'">TRT Invest</h1>
     <form method="get" action="{% url 'search' %}">
-        <input type="text" name="q" placeholder="Pesquisar ativo...">
+        <input type="text" name="q" placeholder="🔍  Pesquisar ativo...">
     </form>
-    <nav>
+    <nav class="header-nav">
         <a href="{% url 'home' %}">Início</a>
         <a href="{% url 'stock_list' %}">Meu Portfolio</a>
         <a href="{% url 'alert_history' %}">Alertas</a>
         <a href="{% url 'settings' %}">Configurações</a>
     </nav>
+    <button class="dark-btn" onclick="toggleDark()" id="dark-btn">🌙</button>
 </header>
 
 <div class="container">
-
     <div class="breadcrumb">
         <a href="{% url 'home' %}">Início</a> &rsaquo;
         <a href="{% url 'stock_list' %}">Portfolio</a> &rsaquo;
@@ -85,11 +97,10 @@
         <div class="msg-{{ msg.tags }}">{{ msg }}</div>
     {% endfor %}
 
-    <!-- Hero -->
     <div class="hero">
         <div class="hero-top">
             <div>
-                <div class="hero-symbol">{{ symbol|cut:".SA" }}</div>
+                <div class="hero-symbol">{{ symbol }}</div>
                 <div class="hero-name">{{ stats.name }}</div>
             </div>
             {% if stock %}
@@ -103,13 +114,11 @@
             </div>
             {% endif %}
         </div>
-
         <div class="hero-price">{{ stats.currency }} {{ stats.price }}</div>
         <div class="hero-change {% if stats.change_pct >= 0 %}up{% else %}down{% endif %}">
             {% if stats.change_pct >= 0 %}▲{% else %}▼{% endif %}
             {{ stats.change_pct }}% hoje
         </div>
-
         <div class="hero-actions">
             {% if stock %}
                 <form method="post" style="display:inline">
@@ -139,7 +148,6 @@
         </div>
     </div>
 
-    <!-- Stats -->
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-label">Mín. 52 semanas</div>
@@ -159,7 +167,9 @@
         </div>
         <div class="stat-card">
             <div class="stat-label">Dividend Yield</div>
-            <div class="stat-value">{% if stats.div_yield != '—' %}{{ stats.div_yield }}%{% else %}—{% endif %}</div>
+            <div class="stat-value">
+                {% if stats.div_yield != '—' %}{{ stats.div_yield }}%{% else %}—{% endif %}
+            </div>
         </div>
         <div class="stat-card">
             <div class="stat-label">P/E Ratio</div>
@@ -171,7 +181,6 @@
         </div>
     </div>
 
-    <!-- Gráfico -->
     {% if chart_data %}
     <div class="chart-card">
         <div class="chart-title">Cotação — últimos 30 dias</div>
@@ -179,7 +188,6 @@
     </div>
     {% endif %}
 
-    <!-- Configurações de alerta -->
     {% if stock %}
     <div class="card">
         <div class="section-title">Configurações de alerta</div>
@@ -194,7 +202,6 @@
         </a>
     </div>
 
-    <!-- Histórico de alertas -->
     {% if alerts %}
     <div class="card">
         <div class="section-title">Últimos alertas</div>
@@ -219,7 +226,6 @@
     </div>
     {% endif %}
 
-    <!-- Histórico de preços -->
     {% if prices %}
     <div class="card">
         <div class="section-title">Histórico de preços registados</div>
@@ -235,7 +241,6 @@
     </div>
     {% endif %}
     {% endif %}
-
 </div>
 
 {% if chart_data %}
@@ -244,7 +249,7 @@ const labels = {{ chart_labels|safe }};
 const data   = {{ chart_data|safe }};
 const up     = data[data.length-1] >= data[0];
 const color  = up ? '#1a7a4a' : '#c0392b';
-
+const isDark = document.body.classList.contains('dark');
 new Chart(document.getElementById('priceChart'), {
     type: 'line',
     data: {
@@ -268,13 +273,29 @@ new Chart(document.getElementById('priceChart'), {
             tooltip: { mode: 'index', intersect: false }
         },
         scales: {
-            x: { grid: { display: false }, ticks: { maxTicksLimit: 8 } },
-            y: { grid: { color: '#f0f0f0' } }
+            x: { grid: { display: false }, ticks: { maxTicksLimit: 8, color: isDark ? '#666' : '#999' } },
+            y: { grid: { color: isDark ? '#1f2535' : '#f0f0f0' }, ticks: { color: isDark ? '#666' : '#999' } }
         }
     }
 });
 </script>
 {% endif %}
 
+<script>
+function toggleDark() {
+    const d = document.body.classList.toggle('dark');
+    localStorage.setItem('trt-dark', d);
+    document.getElementById('dark-btn').textContent = d ? '☀️' : '🌙';
+}
+(function() {
+    if (localStorage.getItem('trt-dark') === 'true') {
+        document.body.classList.add('dark');
+        document.addEventListener('DOMContentLoaded', function() {
+            const b = document.getElementById('dark-btn');
+            if (b) b.textContent = '☀️';
+        });
+    }
+})();
+</script>
 </body>
 </html>

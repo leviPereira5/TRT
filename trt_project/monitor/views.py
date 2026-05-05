@@ -93,13 +93,21 @@ def stock_list(request):
         'settings':    settings,
     })
 
-
 def stock_add(request):
+    import yfinance as yf
     if request.method == 'POST':
         form = StockForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, f"Adicionado: {form.cleaned_data['symbol']}")
+            stock = form.save(commit=False)
+            # Se o nome não foi preenchido, vai buscar automaticamente
+            if not stock.name:
+                try:
+                    info = yf.Ticker(stock.symbol).info
+                    stock.name = info.get('shortName', '') or info.get('longName', '')
+                except Exception:
+                    pass
+            stock.save()
+            messages.success(request, f"Adicionado: {stock.symbol} — {stock.name}")
         else:
             for error in form.errors.values():
                 messages.error(request, error.as_text())
@@ -159,28 +167,29 @@ def alert_history(request):
 
 
 def search(request):
-    import yfinance as yf
+    import requests
     query   = request.GET.get('q', '').strip()
     results = []
     if query:
         try:
-            ticker = yf.Ticker(query.upper())
-            info   = ticker.info
-            price  = (
-                info.get("regularMarketPrice") or
-                info.get("currentPrice") or
-                info.get("previousClose")
-            )
-            prev = info.get("previousClose")
-            if info.get("symbol"):
-                change_pct = round(((price - prev) / prev * 100), 2) if price and prev else 0
+            # Yahoo Finance search API — devolve qualquer ativo mundial
+            url     = f"https://query1.finance.yahoo.com/v1/finance/search?q={query}&lang=pt&region=BR&quotesCount=20&newsCount=0"
+            headers = {'User-Agent': 'Mozilla/5.0'}
+            resp    = requests.get(url, headers=headers, timeout=5)
+            data    = resp.json()
+
+            for item in data.get('quotes', []):
+                symbol = item.get('symbol', '')
+                if not symbol:
+                    continue
                 results.append({
-                    'symbol':     info.get("symbol"),
-                    'name':       info.get("shortName", ""),
-                    'price':      round(price, 2) if price else "—",
-                    'currency':   info.get("currency", ""),
-                    'change_pct': change_pct,
+                    'symbol':   symbol,
+                    'name':     item.get('shortname') or item.get('longname', symbol),
+                    'tipo':     item.get('quoteType', ''),
+                    'exchange': item.get('exchange', ''),
+                    'price':    '—',
+                    'currency': item.get('currency', ''),
                 })
-        except Exception:
+        except Exception as e:
             pass
     return render(request, 'monitor/search.html', {'results': results, 'query': query})
