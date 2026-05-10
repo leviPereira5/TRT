@@ -1,15 +1,54 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from .models import Stock, UserSettings, Alert
 from .forms import StockForm, SettingsForm
 from .services import run_monitoring_cycle, fetch_market_overview, fetch_price
 
 
+def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('home')
+    form_data = {}
+    if request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+        form_data['username'] = username
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            next_url = request.POST.get('next') or request.GET.get('next') or 'home'
+            return redirect(next_url)
+        messages.error(request, 'Utilizador ou password incorretos.')
+    return render(request, 'monitor/login.html', {
+        'form': form_data,
+        'next': request.GET.get('next', ''),
+    })
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+
+def guest_login(request):
+    from django.contrib.auth.models import User
+    guest, _ = User.objects.get_or_create(
+        username='visitante',
+        defaults={'first_name': 'Visitante', 'is_active': True},
+    )
+    login(request, guest, backend='django.contrib.auth.backends.ModelBackend')
+    return redirect('home')
+
+
+@login_required
 def home(request):
     overview = fetch_market_overview()
     return render(request, 'monitor/home.html', {'overview': overview})
 
 
+@login_required
 def stock_detail(request, symbol_yf):
     import yfinance as yf
     stock    = Stock.objects.filter(symbol=symbol_yf).first()
@@ -19,18 +58,73 @@ def stock_detail(request, symbol_yf):
     price      = info.get("regularMarketPrice") or info.get("currentPrice") or info.get("previousClose")
     prev_close = info.get("previousClose")
     change_pct = round(((price - prev_close) / prev_close) * 100, 2) if price and prev_close else 0
+    def _pct(v):
+        return f"{round(v * 100, 2)}%" if v else '—'
+    def _r2(v):
+        return round(v, 2) if v else '—'
+    def _fmt(v):
+        if not v: return '—'
+        if v >= 1_000_000_000: return f"{round(v/1_000_000_000, 2)} B"
+        if v >= 1_000_000:     return f"{round(v/1_000_000, 2)} M"
+        return str(round(v, 2))
+
+    net_debt = None
+    total_debt = info.get('totalDebt')
+    total_cash = info.get('totalCash')
+    if total_debt and total_cash:
+        net_debt = total_debt - total_cash
+
     stats = {
-        'price':       round(price, 2) if price else '—',
-        'change_pct':  change_pct,
-        'currency':    info.get('currency', ''),
-        'name':        info.get('shortName', symbol_yf),
-        'week52_low':  info.get('fiftyTwoWeekLow', '—'),
-        'week52_high': info.get('fiftyTwoWeekHigh', '—'),
-        'day_low':     info.get('dayLow', '—'),
-        'day_high':    info.get('dayHigh', '—'),
-        'div_yield':   round(info.get('dividendYield', 0) * 100, 2) if info.get('dividendYield') else '—',
-        'volume':      info.get('regularMarketVolume', '—'),
-        'pe_ratio':    info.get('trailingPE', '—'),
+        # Preço
+        'price':        round(price, 2) if price else '—',
+        'change_pct':   change_pct,
+        'currency':     info.get('currency', ''),
+        'name':         info.get('shortName', symbol_yf),
+        'long_name':    info.get('longName', ''),
+        'sector':       info.get('sector', '—'),
+        'industry':     info.get('industry', '—'),
+        # Preço / dia / 52w
+        'week52_low':   _r2(info.get('fiftyTwoWeekLow')),
+        'week52_high':  _r2(info.get('fiftyTwoWeekHigh')),
+        'day_low':      _r2(info.get('dayLow')),
+        'day_high':     _r2(info.get('dayHigh')),
+        'volume':       _fmt(info.get('regularMarketVolume')),
+        'avg_volume':   _fmt(info.get('averageVolume')),
+        # Valuation
+        'div_yield':    _pct(info.get('dividendYield')),
+        'pe_ratio':     _r2(info.get('trailingPE')),
+        'forward_pe':   _r2(info.get('forwardPE')),
+        'pb_ratio':     _r2(info.get('priceToBook')),
+        'ps_ratio':     _r2(info.get('priceToSalesTrailing12Months')),
+        'ev_ebitda':    _r2(info.get('enterpriseToEbitda')),
+        'ev_revenue':   _r2(info.get('enterpriseToRevenue')),
+        'eps':          _r2(info.get('trailingEps')),
+        'book_value':   _r2(info.get('bookValue')),
+        'peg_ratio':    _r2(info.get('pegRatio')),
+        # Eficiência (margens)
+        'gross_margin':  _pct(info.get('grossMargins')),
+        'ebitda_margin': _pct(info.get('ebitdaMargins')),
+        'op_margin':     _pct(info.get('operatingMargins')),
+        'net_margin':    _pct(info.get('profitMargins')),
+        # Rentabilidade
+        'roe':   _pct(info.get('returnOnEquity')),
+        'roa':   _pct(info.get('returnOnAssets')),
+        # Endividamento
+        'current_ratio': _r2(info.get('currentRatio')),
+        'debt_equity':   _r2(info.get('debtToEquity')),
+        # Balanço
+        'market_cap':        _fmt(info.get('marketCap')),
+        'enterprise_value':  _fmt(info.get('enterpriseValue')),
+        'total_debt':        _fmt(total_debt),
+        'total_cash':        _fmt(total_cash),
+        'net_debt':          _fmt(net_debt),
+        'shares':            _fmt(info.get('sharesOutstanding')),
+        # Crescimento
+        'rev_growth':  _pct(info.get('revenueGrowth')),
+        'earn_growth': _pct(info.get('earningsGrowth')),
+        'revenue':     _fmt(info.get('totalRevenue')),
+        'ebitda':      _fmt(info.get('ebitda')),
+        'free_cash':   _fmt(info.get('freeCashflow')),
     }
     hist = ticker.history(period='1mo')
     chart_labels = []
@@ -77,6 +171,7 @@ def stock_detail(request, symbol_yf):
     })
 
 
+@login_required
 def stock_list(request):
     stocks   = Stock.objects.all().order_by('-added_at')
     settings = UserSettings.objects.first()
@@ -93,6 +188,7 @@ def stock_list(request):
         'settings':    settings,
     })
 
+@login_required
 def stock_add(request):
     import yfinance as yf
     if request.method == 'POST':
@@ -114,6 +210,7 @@ def stock_add(request):
     return redirect('stock_list')
 
 
+@login_required
 def stock_remove(request, pk):
     stock = get_object_or_404(Stock, pk=pk)
     stock.delete()
@@ -121,6 +218,7 @@ def stock_remove(request, pk):
     return redirect('stock_list')
 
 
+@login_required
 def stock_toggle(request, pk):
     stock = get_object_or_404(Stock, pk=pk)
     stock.is_active = not stock.is_active
@@ -130,6 +228,7 @@ def stock_toggle(request, pk):
     return redirect('stock_list')
 
 
+@login_required
 def settings_view(request):
     s = UserSettings.objects.first() or UserSettings.objects.create()
     if request.method == 'POST':
@@ -146,6 +245,7 @@ def settings_view(request):
     return render(request, 'monitor/settings.html', {'form': form, 'settings': s})
 
 
+@login_required
 def run_monitor(request):
     results = run_monitoring_cycle()
     for r in results:
@@ -161,11 +261,13 @@ def run_monitor(request):
     return redirect('stock_list')
 
 
+@login_required
 def alert_history(request):
     alerts = Alert.objects.select_related('stock').all()[:100]
     return render(request, 'monitor/alert_history.html', {'alerts': alerts})
 
 
+@login_required
 def search(request):
     import requests
     query   = request.GET.get('q', '').strip()

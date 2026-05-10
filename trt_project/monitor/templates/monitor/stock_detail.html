@@ -3,15 +3,175 @@
 
 {% block extra_head %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ── Indicator grid ── */
+.ind-section { margin-bottom: 24px; }
+
+.ind-section-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 3px solid var(--y);
+}
+
+.ind-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+}
+
+.ind-card {
+    background: var(--white);
+    border: 1.5px solid var(--line);
+    border-radius: 9px;
+    padding: 13px 14px;
+    transition: border-color .18s, box-shadow .18s;
+    cursor: default;
+}
+
+.ind-card:hover {
+    border-color: var(--y);
+    box-shadow: 0 2px 12px rgba(255,214,0,.1);
+}
+
+.ind-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--muted-2);
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ind-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -.5px;
+    line-height: 1.1;
+}
+
+.ind-value.up   { color: var(--green); }
+.ind-value.down { color: var(--red); }
+
+/* ── Company card ── */
+.company-card {
+    background: var(--white);
+    border: 1.5px solid var(--line);
+    border-radius: var(--r);
+    padding: 20px 22px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.company-name { font-size: 16px; font-weight: 800; color: var(--ink); }
+.company-sub  { font-size: 12px; color: var(--muted-2); margin-top: 2px; }
+
+.company-meta {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.company-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 700;
+    background: var(--y);
+    color: var(--black);
+}
+
+.company-tag-gray {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--bg);
+    color: var(--muted);
+    border: 1px solid var(--line);
+}
+
+/* ── Balance grid ── */
+.balance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.balance-card {
+    background: var(--white);
+    border: 1.5px solid var(--line);
+    border-radius: 9px;
+    padding: 14px 16px;
+}
+
+.balance-label { font-size: 10.5px; font-weight: 700; color: var(--muted-2); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
+.balance-value { font-size: 15px; font-weight: 800; color: var(--ink); letter-spacing: -.3px; }
+
+/* ── Indicator tabs ── */
+.ind-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--line);
+    padding-bottom: 0;
+}
+
+.ind-tab {
+    padding: 8px 16px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--muted-2);
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    font-family: inherit;
+    transition: color .18s, border-color .18s;
+    white-space: nowrap;
+}
+
+.ind-tab:hover { color: var(--ink); }
+.ind-tab.active { color: var(--ink); border-bottom-color: var(--y); font-weight: 700; }
+
+.ind-panel { display: none; }
+.ind-panel.active { display: block; }
+
+/* ── Dark mode ── */
+body.dark .ind-card    { background: var(--white); border-color: var(--line); }
+body.dark .company-card { background: var(--white); border-color: var(--line); }
+body.dark .balance-card { background: var(--white); border-color: var(--line); }
+body.dark .ind-tabs     { border-color: var(--line); }
+body.dark .company-tag-gray { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.1); }
+</style>
 {% endblock %}
 
 {% block content %}
+
 <div class="breadcrumb">
     <a href="{% url 'home' %}">Início</a> &rsaquo;
-    <a href="{% url 'stock_list' %}">Portfolio</a> &rsaquo;
+    <a href="{% url 'stock_list' %}">Portfólio</a> &rsaquo;
     {{ symbol }}
 </div>
 
+<!-- ══ HERO ══ -->
 <div class="hero">
     <div class="hero-top">
         <div>
@@ -20,9 +180,12 @@
         </div>
         {% if stock %}
         <div style="text-align:right">
-            <div style="font-size:13px;color:#aac4e8">Monitorização</div>
-            {% if stock.is_active %}<span class="status-active">● Ativa</span>
-            {% else %}<span class="status-paused">● Pausada</span>{% endif %}
+            <div style="font-size:11px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.5px">Monitorização</div>
+            {% if stock.is_active %}
+                <span class="status-active" style="color:#4ade80">● Ativa</span>
+            {% else %}
+                <span class="status-paused" style="color:rgba(255,255,255,.3)">● Pausada</span>
+            {% endif %}
         </div>
         {% endif %}
     </div>
@@ -32,40 +195,50 @@
     </div>
     <div class="hero-actions">
         {% if stock %}
-            <form method="post" style="display:inline">
-                {% csrf_token %}
+            <form method="post" style="display:inline">{% csrf_token %}
                 <input type="hidden" name="action" value="toggle">
-                <button class="btn btn-toggle">{% if stock.is_active %}Pausar{% else %}Ativar{% endif %} monitorização</button>
+                <button class="btn btn-toggle">{% if stock.is_active %}Pausar{% else %}Ativar{% endif %}</button>
             </form>
-            <form method="post" style="display:inline" onsubmit="return confirm('Remover?')">
-                {% csrf_token %}
+            <form method="post" style="display:inline" onsubmit="return confirm('Remover?')">{% csrf_token %}
                 <input type="hidden" name="action" value="remove">
                 <button class="btn btn-remove">Remover</button>
             </form>
-            <form method="post" action="{% url 'run_monitor' %}" style="display:inline">
-                {% csrf_token %}
-                <button class="btn btn-monitor">▶ Monitorizar agora</button>
-            </form>
         {% else %}
-            <form method="post">
-                {% csrf_token %}
+            <form method="post">{% csrf_token %}
                 <input type="hidden" name="action" value="add">
                 <button class="btn btn-add">+ Adicionar à monitorização</button>
             </form>
         {% endif %}
+        <a href="{% url 'run_monitor' %}" class="btn btn-monitor" style="text-decoration:none">▶ Monitorizar</a>
     </div>
 </div>
 
-<div class="stats-grid">
-    <div class="stat-card"><div class="stat-label">Mín. 52 semanas</div><div class="stat-value">{{ stats.week52_low }}</div></div>
-    <div class="stat-card"><div class="stat-label">Máx. 52 semanas</div><div class="stat-value">{{ stats.week52_high }}</div></div>
+<!-- ══ COMPANY INFO ══ -->
+{% if stats.long_name or stats.sector != '—' %}
+<div class="company-card">
+    <div>
+        <div class="company-name">{{ stats.long_name|default:stats.name }}</div>
+        <div class="company-sub">{{ symbol }}</div>
+    </div>
+    <div class="company-meta">
+        {% if stats.sector != '—' %}<span class="company-tag">{{ stats.sector }}</span>{% endif %}
+        {% if stats.industry != '—' %}<span class="company-tag-gray">{{ stats.industry }}</span>{% endif %}
+        {% if stats.currency %}<span class="company-tag-gray">{{ stats.currency }}</span>{% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- ══ PRICE STATS ══ -->
+<div class="stats-grid" style="margin-bottom:20px">
     <div class="stat-card"><div class="stat-label">Mín. hoje</div><div class="stat-value">{{ stats.day_low }}</div></div>
     <div class="stat-card"><div class="stat-label">Máx. hoje</div><div class="stat-value">{{ stats.day_high }}</div></div>
-    <div class="stat-card"><div class="stat-label">Dividend Yield</div><div class="stat-value">{% if stats.div_yield != '—' %}{{ stats.div_yield }}%{% else %}—{% endif %}</div></div>
-    <div class="stat-card"><div class="stat-label">P/E Ratio</div><div class="stat-value">{{ stats.pe_ratio }}</div></div>
+    <div class="stat-card"><div class="stat-label">Mín. 52 sem.</div><div class="stat-value">{{ stats.week52_low }}</div></div>
+    <div class="stat-card"><div class="stat-label">Máx. 52 sem.</div><div class="stat-value">{{ stats.week52_high }}</div></div>
     <div class="stat-card"><div class="stat-label">Volume</div><div class="stat-value" style="font-size:15px">{{ stats.volume }}</div></div>
+    <div class="stat-card"><div class="stat-label">Vol. Médio</div><div class="stat-value" style="font-size:15px">{{ stats.avg_volume }}</div></div>
 </div>
 
+<!-- ══ CHART ══ -->
 {% if chart_data %}
 <div class="chart-card">
     <div class="chart-title">Cotação — últimos 30 dias</div>
@@ -73,26 +246,211 @@
 </div>
 {% endif %}
 
+<!-- ══ FINANCIAL INDICATORS ══ -->
+<div class="card" style="margin-bottom:20px">
+    <div class="ind-tabs">
+        <button class="ind-tab active" onclick="showTab('valuation', this)">Valuation</button>
+        <button class="ind-tab" onclick="showTab('eficiencia', this)">Eficiência</button>
+        <button class="ind-tab" onclick="showTab('rentabilidade', this)">Rentabilidade</button>
+        <button class="ind-tab" onclick="showTab('endividamento', this)">Endividamento</button>
+        <button class="ind-tab" onclick="showTab('crescimento', this)">Crescimento</button>
+    </div>
+
+    <!-- Valuation -->
+    <div class="ind-panel active" id="tab-valuation">
+        <div class="ind-grid">
+            <div class="ind-card">
+                <div class="ind-label">D.Y (Div. Yield)</div>
+                <div class="ind-value">{{ stats.div_yield }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">P/L (P/E)</div>
+                <div class="ind-value">{{ stats.pe_ratio }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">P/L Forward</div>
+                <div class="ind-value">{{ stats.forward_pe }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">PEG Ratio</div>
+                <div class="ind-value">{{ stats.peg_ratio }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">P/VP (P/B)</div>
+                <div class="ind-value">{{ stats.pb_ratio }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">P/SR (P/S)</div>
+                <div class="ind-value">{{ stats.ps_ratio }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">EV/EBITDA</div>
+                <div class="ind-value">{{ stats.ev_ebitda }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">EV/Revenue</div>
+                <div class="ind-value">{{ stats.ev_revenue }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">LPA (EPS)</div>
+                <div class="ind-value">{{ stats.eps }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">VPA (Book/Share)</div>
+                <div class="ind-value">{{ stats.book_value }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Eficiência -->
+    <div class="ind-panel" id="tab-eficiencia">
+        <div class="ind-grid">
+            <div class="ind-card">
+                <div class="ind-label">Margem Bruta</div>
+                <div class="ind-value {% if stats.gross_margin != '—' %}up{% endif %}">{{ stats.gross_margin }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">Margem EBITDA</div>
+                <div class="ind-value {% if stats.ebitda_margin != '—' %}up{% endif %}">{{ stats.ebitda_margin }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">Margem EBIT</div>
+                <div class="ind-value {% if stats.op_margin != '—' %}up{% endif %}">{{ stats.op_margin }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">Margem Líquida</div>
+                <div class="ind-value {% if stats.net_margin != '—' %}up{% endif %}">{{ stats.net_margin }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">Receita Total</div>
+                <div class="ind-value" style="font-size:15px">{{ stats.revenue }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">EBITDA</div>
+                <div class="ind-value" style="font-size:15px">{{ stats.ebitda }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">Free Cash Flow</div>
+                <div class="ind-value" style="font-size:15px">{{ stats.free_cash }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rentabilidade -->
+    <div class="ind-panel" id="tab-rentabilidade">
+        <div class="ind-grid">
+            <div class="ind-card">
+                <div class="ind-label">ROE</div>
+                <div class="ind-value {% if stats.roe != '—' %}up{% endif %}">{{ stats.roe }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">ROA</div>
+                <div class="ind-value {% if stats.roa != '—' %}up{% endif %}">{{ stats.roa }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">D.Y (Yield)</div>
+                <div class="ind-value {% if stats.div_yield != '—' %}up{% endif %}">{{ stats.div_yield }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">LPA (EPS)</div>
+                <div class="ind-value">{{ stats.eps }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Endividamento -->
+    <div class="ind-panel" id="tab-endividamento">
+        <div class="ind-grid">
+            <div class="ind-card">
+                <div class="ind-label">Dívida/PL</div>
+                <div class="ind-value">{{ stats.debt_equity }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">Liq. Corrente</div>
+                <div class="ind-value {% if stats.current_ratio != '—' %}up{% endif %}">{{ stats.current_ratio }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">Dívida Bruta</div>
+                <div class="ind-value" style="font-size:14px">{{ stats.total_debt }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">Caixa</div>
+                <div class="ind-value" style="font-size:14px">{{ stats.total_cash }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">Dívida Líquida</div>
+                <div class="ind-value" style="font-size:14px">{{ stats.net_debt }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Crescimento -->
+    <div class="ind-panel" id="tab-crescimento">
+        <div class="ind-grid">
+            <div class="ind-card">
+                <div class="ind-label">Cresc. Receita</div>
+                <div class="ind-value {% if stats.rev_growth != '—' %}up{% endif %}">{{ stats.rev_growth }}</div>
+            </div>
+            <div class="ind-card">
+                <div class="ind-label">Cresc. Lucro</div>
+                <div class="ind-value {% if stats.earn_growth != '—' %}up{% endif %}">{{ stats.earn_growth }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ BALANCE SHEET HIGHLIGHTS ══ -->
+<div class="card" style="margin-bottom:20px">
+    <div class="section-title">Balanço Patrimonial</div>
+    <div class="balance-grid">
+        <div class="balance-card">
+            <div class="balance-label">Market Cap</div>
+            <div class="balance-value">{{ stats.market_cap }}</div>
+        </div>
+        <div class="balance-card">
+            <div class="balance-label">Valor de Firma (EV)</div>
+            <div class="balance-value">{{ stats.enterprise_value }}</div>
+        </div>
+        <div class="balance-card">
+            <div class="balance-label">Receita Total</div>
+            <div class="balance-value">{{ stats.revenue }}</div>
+        </div>
+        <div class="balance-card">
+            <div class="balance-label">EBITDA</div>
+            <div class="balance-value">{{ stats.ebitda }}</div>
+        </div>
+        <div class="balance-card">
+            <div class="balance-label">Free Cash Flow</div>
+            <div class="balance-value">{{ stats.free_cash }}</div>
+        </div>
+        <div class="balance-card">
+            <div class="balance-label">Nº de Ações</div>
+            <div class="balance-value">{{ stats.shares }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ ALERT SETTINGS ══ -->
 {% if stock %}
-<div class="card">
-    <div class="section-title">Configurações de alerta</div>
-    <p style="font-size:13px;color:#888;margin-bottom:12px">
+<div class="card" style="margin-bottom:20px">
+    <div class="section-title">Configurações de Alerta</div>
+    <p style="font-size:13px;color:var(--muted-2);margin-bottom:12px">
         Alta ≥ <strong>{{ settings.alert_threshold_high }}%</strong> &nbsp;|&nbsp;
         Baixa ≥ <strong>{{ settings.alert_threshold_low }}%</strong> &nbsp;|&nbsp;
         Email: <strong>{{ settings.alert_email|default:"não configurado" }}</strong>
     </p>
-    <a href="{% url 'settings' %}" class="btn btn-monitor" style="text-decoration:none;display:inline-block">Editar configurações</a>
+    <a href="{% url 'settings' %}" class="btn btn-monitor" style="text-decoration:none;display:inline-flex">Editar configurações</a>
 </div>
 
 {% if alerts %}
-<div class="card">
-    <div class="section-title">Últimos alertas</div>
+<div class="card" style="margin-bottom:20px">
+    <div class="section-title">Últimos Alertas</div>
     <table>
         <tr><th>Data/Hora</th><th>Direção</th><th>Variação</th><th>Preço</th><th>Email</th></tr>
         {% for alert in alerts %}
         <tr>
             <td>{{ alert.sent_at|date:"d/m/Y H:i" }}</td>
-            <td>{% if alert.direction == 'high' %}<span class="badge-high">⬆ Alta</span>{% else %}<span class="badge-low">⬇ Baixa</span>{% endif %}</td>
+            <td>{% if alert.direction == 'high' %}<span class="badge-high">▲ Alta</span>{% else %}<span class="badge-low">▼ Baixa</span>{% endif %}</td>
             <td>{{ alert.variation }}%</td>
             <td>{{ alert.price }}</td>
             <td>{% if alert.email_sent %}✅{% else %}—{% endif %}</td>
@@ -101,32 +459,19 @@
     </table>
 </div>
 {% endif %}
+{% endif %}
 
-{% if prices %}
-<div class="card">
-    <div class="section-title">Histórico de preços</div>
-    <table>
-        <tr><th>Data/Hora</th><th>Preço</th></tr>
-        {% for p in prices %}
-        <tr>
-            <td>{{ p.fetched_at|date:"d/m/Y H:i:s" }}</td>
-            <td>{{ p.price }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-</div>
-{% endif %}
-{% endif %}
 {% endblock %}
 
 {% block extra_js %}
 {% if chart_data %}
 <script>
-const labels = {{ chart_labels|safe }};
-const data   = {{ chart_data|safe }};
-const up     = data[data.length-1] >= data[0];
-const color  = up ? '#1a7a4a' : '#c0392b';
-const isDark = document.body.classList.contains('dark');
+var labels = {{ chart_labels|safe }};
+var data   = {{ chart_data|safe }};
+var up     = data[data.length-1] >= data[0];
+var color  = up ? '#16a34a' : '#dc2626';
+var isDark = document.body.classList.contains('dark');
+
 new Chart(document.getElementById('priceChart'), {
     type: 'line',
     data: {
@@ -135,23 +480,35 @@ new Chart(document.getElementById('priceChart'), {
             label: 'Preço de fecho',
             data: data,
             borderColor: color,
-            backgroundColor: up ? 'rgba(26,122,74,.10)' : 'rgba(192,57,43,.10)',
+            backgroundColor: up ? 'rgba(22,163,74,.08)' : 'rgba(220,38,38,.08)',
             borderWidth: 2,
-            pointRadius: 3,
+            pointRadius: 2,
             pointHoverRadius: 5,
             fill: true,
-            tension: 0.3,
+            tension: 0.35,
         }]
     },
     options: {
         responsive: true,
-        plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+        plugins: {
+            legend: { display: false },
+            tooltip: { mode: 'index', intersect: false }
+        },
         scales: {
-            x: { grid: { display: false }, ticks: { maxTicksLimit: 8, color: isDark ? '#666' : '#999' } },
-            y: { grid: { color: isDark ? '#1f2535' : '#f0f0f0' }, ticks: { color: isDark ? '#666' : '#999' } }
+            x: { grid: { display: false }, ticks: { maxTicksLimit: 8, color: isDark ? '#666' : '#aaa' } },
+            y: { grid: { color: isDark ? '#1f2535' : '#f0f0f0' }, ticks: { color: isDark ? '#666' : '#aaa' } }
         }
     }
 });
 </script>
 {% endif %}
+
+<script>
+function showTab(id, btn) {
+    document.querySelectorAll('.ind-panel').forEach(function(p){ p.classList.remove('active'); });
+    document.querySelectorAll('.ind-tab').forEach(function(b){ b.classList.remove('active'); });
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+}
+</script>
 {% endblock %}

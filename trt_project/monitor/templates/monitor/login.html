@@ -1,0 +1,831 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — TRT Invest</title>
+    <style>
+        /* ===== RESET ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --yellow: #FFD600;
+            --yellow-dim: rgba(255, 214, 0, 0.15);
+            --yellow-glow: rgba(255, 214, 0, 0.35);
+            --black: #0a0a0a;
+            --dark: #111214;
+            --dark-2: #1a1d23;
+            --dark-3: #23262e;
+            --white: #ffffff;
+            --gray-100: #f5f5f7;
+            --gray-200: #e5e5ea;
+            --gray-400: #99999f;
+            --gray-600: #555560;
+            --radius: 14px;
+            --transition: 0.22s cubic-bezier(.4,0,.2,1);
+        }
+
+        html, body {
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            background: var(--black);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== LAYOUT ===== */
+        .login-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 100vh;
+        }
+
+        /* ===== LEFT PANEL ===== */
+        .panel-left {
+            position: relative;
+            background: var(--dark);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 64px 60px;
+        }
+
+        /* Animated gradient background */
+        .panel-left::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 60% at 20% 30%, rgba(255,214,0,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 80% 70%, rgba(255,214,0,0.05) 0%, transparent 55%),
+                radial-gradient(ellipse 80% 80% at 50% 50%, rgba(20,20,30,0.5) 0%, transparent 100%);
+            pointer-events: none;
+        }
+
+        /* Geometric shapes */
+        .geo-shape {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .geo-circle-1 {
+            width: 380px;
+            height: 380px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,214,0,0.10);
+            top: -100px;
+            right: -100px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .geo-circle-2 {
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,214,0,0.07);
+            bottom: 60px;
+            left: -60px;
+            animation: float 11s ease-in-out infinite reverse;
+        }
+
+        .geo-circle-3 {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(255,214,0,0.04);
+            top: 40%;
+            right: 40px;
+            animation: pulse 5s ease-in-out infinite;
+        }
+
+        .geo-rect-1 {
+            width: 80px;
+            height: 80px;
+            border: 1px solid rgba(255,214,0,0.08);
+            border-radius: 16px;
+            top: 30%;
+            right: 15%;
+            transform: rotate(25deg);
+            animation: spin-slow 20s linear infinite;
+        }
+
+        .geo-rect-2 {
+            width: 44px;
+            height: 44px;
+            border: 1px solid rgba(255,214,0,0.12);
+            border-radius: 8px;
+            bottom: 22%;
+            right: 28%;
+            transform: rotate(-15deg);
+            animation: spin-slow 14s linear infinite reverse;
+        }
+
+        .geo-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--yellow);
+            opacity: 0.4;
+        }
+
+        .geo-dot-1 { top: 28%; left: 45%; animation: pulse 3s ease-in-out infinite; }
+        .geo-dot-2 { top: 55%; right: 20%; animation: pulse 4s ease-in-out infinite 1s; }
+        .geo-dot-3 { bottom: 30%; left: 30%; animation: pulse 3.5s ease-in-out infinite 0.5s; }
+
+        /* Grid pattern overlay */
+        .grid-overlay {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,214,0,0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,214,0,0.025) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+        }
+
+        /* Left content */
+        .panel-left-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,214,0,0.1);
+            border: 1px solid rgba(255,214,0,0.2);
+            border-radius: 100px;
+            padding: 6px 16px 6px 10px;
+            margin-bottom: 48px;
+        }
+
+        .brand-badge .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--yellow);
+            box-shadow: 0 0 8px var(--yellow);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .brand-badge span {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--yellow);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .left-headline {
+            font-size: clamp(32px, 3.5vw, 48px);
+            font-weight: 800;
+            color: var(--white);
+            line-height: 1.15;
+            letter-spacing: -1px;
+            margin-bottom: 20px;
+        }
+
+        .left-headline .accent {
+            color: var(--yellow);
+        }
+
+        .left-subtitle {
+            font-size: 16px;
+            color: var(--gray-400);
+            line-height: 1.7;
+            max-width: 380px;
+            margin-bottom: 48px;
+        }
+
+        /* Feature pills */
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .feature-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--yellow-dim);
+            border: 1px solid rgba(255,214,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .feature-icon svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--yellow);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .feature-text {
+            font-size: 14px;
+            color: #c0c0cc;
+            font-weight: 500;
+        }
+
+        /* Bottom tagline */
+        .left-tagline {
+            position: absolute;
+            bottom: 40px;
+            left: 60px;
+            right: 60px;
+            z-index: 2;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .left-tagline p {
+            font-size: 12px;
+            color: rgba(255,255,255,0.3);
+        }
+
+        .left-tagline strong {
+            color: rgba(255,214,0,0.6);
+        }
+
+        /* ===== RIGHT PANEL ===== */
+        .panel-right {
+            background: var(--white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 64px 48px;
+            position: relative;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 380px;
+        }
+
+        /* Logo */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+
+        .logo-mark {
+            width: 38px;
+            height: 38px;
+            background: var(--black);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-mark svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--yellow);
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--black);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: var(--gray-400);
+            font-weight: 400;
+        }
+
+        /* Headings */
+        .form-heading {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--black);
+            letter-spacing: -0.8px;
+            margin-bottom: 6px;
+        }
+
+        .form-subheading {
+            font-size: 14px;
+            color: var(--gray-400);
+            margin-bottom: 32px;
+            line-height: 1.6;
+        }
+
+        /* Messages */
+        .form-messages {
+            margin-bottom: 16px;
+        }
+
+        .msg-error-box {
+            background: #fff0f0;
+            border: 1px solid #ffd0d0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #c0392b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .msg-error-box svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            stroke: #c0392b;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Form fields */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gray-600);
+            margin-bottom: 7px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            pointer-events: none;
+        }
+
+        .input-icon svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--gray-400);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 13px 14px 13px 44px;
+            font-size: 14px;
+            color: var(--black);
+            background: var(--gray-100);
+            border: 1.5px solid var(--gray-200);
+            border-radius: 10px;
+            outline: none;
+            transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+            font-family: inherit;
+        }
+
+        .form-input::placeholder {
+            color: var(--gray-400);
+        }
+
+        .form-input:focus {
+            background: var(--white);
+            border-color: var(--black);
+            box-shadow: 0 0 0 4px rgba(0,0,0,0.06);
+        }
+
+        /* Password toggle */
+        .pwd-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: var(--gray-400);
+            display: flex;
+            align-items: center;
+            transition: color var(--transition);
+        }
+
+        .pwd-toggle:hover { color: var(--black); }
+
+        .pwd-toggle svg {
+            width: 16px;
+            height: 16px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Forgot password */
+        .field-meta {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 6px;
+        }
+
+        .link-sm {
+            font-size: 12px;
+            color: var(--gray-400);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition);
+        }
+
+        .link-sm:hover { color: var(--black); }
+
+        /* Buttons */
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: var(--black);
+            color: var(--white);
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+            position: relative;
+            overflow: hidden;
+            font-family: inherit;
+        }
+
+        .btn-login::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,214,0,0.15) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity var(--transition);
+        }
+
+        .btn-login:hover {
+            background: #1a1a1a;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+        }
+
+        .btn-login:hover::after { opacity: 1; }
+
+        .btn-login:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .btn-login.loading .btn-label { opacity: 0; }
+
+        .btn-login .spinner {
+            display: none;
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+
+        .btn-login.loading .spinner { display: block; }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 4px 0 12px;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--gray-200);
+        }
+
+        .divider span {
+            font-size: 11px;
+            color: var(--gray-400);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        /* Guest button */
+        .btn-guest {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: var(--gray-600);
+            border: 1.5px dashed var(--gray-200);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: border-color var(--transition), color var(--transition), background var(--transition);
+            font-family: inherit;
+        }
+
+        .btn-guest:hover {
+            border-color: #bbb;
+            color: var(--black);
+            background: var(--gray-100);
+        }
+
+        /* Footer link */
+        .form-footer {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--gray-400);
+        }
+
+        .form-footer a {
+            color: var(--black);
+            font-weight: 700;
+            text-decoration: none;
+            border-bottom: 1.5px solid var(--yellow);
+            padding-bottom: 1px;
+            transition: color var(--transition), border-color var(--transition);
+        }
+
+        .form-footer a:hover { color: #333; }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-18px) rotate(3deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; transform: scale(1); }
+            50% { opacity: 0.9; transform: scale(1.15); }
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-right { animation: fade-up 0.5s ease both; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 820px) {
+            .login-wrapper { grid-template-columns: 1fr; }
+            .panel-left { display: none; }
+            .panel-right { min-height: 100vh; padding: 48px 24px; }
+            .form-container { max-width: 100%; }
+        }
+
+        @media (max-width: 480px) {
+            .panel-right { padding: 32px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-wrapper">
+
+    <!-- ===== LEFT PANEL ===== -->
+    <div class="panel-left">
+        <div class="grid-overlay"></div>
+
+        <!-- Geometric shapes -->
+        <div class="geo-shape geo-circle-1"></div>
+        <div class="geo-shape geo-circle-2"></div>
+        <div class="geo-shape geo-circle-3"></div>
+        <div class="geo-shape geo-rect-1"></div>
+        <div class="geo-shape geo-rect-2"></div>
+        <div class="geo-shape geo-dot geo-dot-1"></div>
+        <div class="geo-shape geo-dot geo-dot-2"></div>
+        <div class="geo-shape geo-dot geo-dot-3"></div>
+
+        <div class="panel-left-content">
+            <div class="brand-badge">
+                <div class="dot"></div>
+                <span>TRT Invest — Platform</span>
+            </div>
+
+            <h1 class="left-headline">
+                Bem-vindo<br>de <span class="accent">volta.</span>
+            </h1>
+
+            <p class="left-subtitle">
+                Acede ao teu dashboard e gere o teu portfólio com eficiência e precisão em tempo real.
+            </p>
+
+            <div class="features">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    </div>
+                    <span class="feature-text">Monitorização de ativos em tempo real</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                    </div>
+                    <span class="feature-text">Análise avançada do teu portfólio</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    </div>
+                    <span class="feature-text">Alertas inteligentes personalizados</span>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <span class="feature-text">Automação e ferramentas inteligentes</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="left-tagline">
+            <p>Impulsiona a tua <strong>produtividade</strong> e simplifica o teu fluxo de trabalho.</p>
+        </div>
+    </div>
+
+    <!-- ===== RIGHT PANEL ===== -->
+    <div class="panel-right">
+        <div class="form-container">
+
+            <!-- Logo -->
+            <div class="logo">
+                <div class="logo-mark">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 17l4-8 4 5 3-3 4 6H3z"/>
+                    </svg>
+                </div>
+                <div class="logo-text">TRT <span>Invest</span></div>
+            </div>
+
+            <h2 class="form-heading">Bem-vindo de volta</h2>
+            <p class="form-subheading">Acede ao teu dashboard e gere o teu workflow com eficiência.</p>
+
+            <!-- Error messages -->
+            {% if messages %}
+            <div class="form-messages">
+                {% for message in messages %}
+                <div class="msg-error-box">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Login Form -->
+            <form method="post" id="login-form" novalidate>
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label class="form-label" for="id_username">Email / Utilizador</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">
+                            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        </span>
+                        <input
+                            class="form-input"
+                            type="text"
+                            id="id_username"
+                            name="username"
+                            placeholder="o-teu@email.com"
+                            autocomplete="username"
+                            autofocus
+                            value="{{ form.username|default:'' }}"
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        </span>
+                        <input
+                            class="form-input"
+                            type="password"
+                            id="id_password"
+                            name="password"
+                            placeholder="••••••••"
+                            autocomplete="current-password"
+                        >
+                        <button type="button" class="pwd-toggle" id="pwd-toggle" aria-label="Mostrar password">
+                            <svg id="eye-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                    <div class="field-meta">
+                        <a href="#" class="link-sm">Esqueceste a password?</a>
+                    </div>
+                </div>
+
+                <input type="hidden" name="next" value="{{ next }}">
+
+                <button type="submit" class="btn-login" id="btn-login">
+                    <span class="btn-label">Entrar na plataforma</span>
+                    <div class="spinner"></div>
+                </button>
+
+            </form>
+
+            <div class="divider" style="margin-top:20px;"><span>ou</span></div>
+
+            <a href="{% url 'guest_login' %}" class="btn-guest">
+                <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+                Continuar sem conta (visitante)
+            </a>
+
+            <div class="form-footer">
+                Não tens conta?&nbsp;
+                <a href="#">Criar conta</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Password visibility toggle
+    const pwdInput = document.getElementById('id_password');
+    const pwdToggle = document.getElementById('pwd-toggle');
+    const eyeIcon = document.getElementById('eye-icon');
+
+    const eyeOpen = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    const eyeClosed = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+
+    pwdToggle.addEventListener('click', () => {
+        const isPassword = pwdInput.type === 'password';
+        pwdInput.type = isPassword ? 'text' : 'password';
+        eyeIcon.innerHTML = isPassword ? eyeClosed : eyeOpen;
+    });
+
+    // Loading state on submit
+    const form = document.getElementById('login-form');
+    const btn = document.getElementById('btn-login');
+
+    form.addEventListener('submit', () => {
+        btn.classList.add('loading');
+        btn.disabled = true;
+        setTimeout(() => {
+            btn.classList.remove('loading');
+            btn.disabled = false;
+        }, 8000);
+    });
+</script>
+
+</body>
+</html>
