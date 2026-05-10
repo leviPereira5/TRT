@@ -118,6 +118,93 @@
 
 {% endwith %}
 
+<!-- ══ TAXAS DE REFERÊNCIA (BCB) ══ -->
+{% if taxas %}
+<div class="category-block">
+    <div class="mkt-header">
+        <div class="section-title">🏛️ Taxas de Referência — Banco Central</div>
+    </div>
+    <div class="taxas-row">
+
+        {% if taxas.selic %}
+        <div class="taxa-card taxa-selic">
+            <div class="taxa-label">{{ taxas.selic.nome }}</div>
+            <div class="taxa-valor">{{ taxas.selic.valor }}<span class="taxa-unit">{{ taxas.selic.unidade }}</span></div>
+            <div class="taxa-data">Atualizado: {{ taxas.selic.data }}</div>
+        </div>
+        {% endif %}
+
+        {% if taxas.ipca %}
+        <div class="taxa-card taxa-ipca">
+            <div class="taxa-label">{{ taxas.ipca.nome }}</div>
+            <div class="taxa-valor">{{ taxas.ipca.valor }}<span class="taxa-unit">{{ taxas.ipca.unidade }}</span></div>
+            <div class="taxa-data">Atualizado: {{ taxas.ipca.data }}</div>
+        </div>
+        {% endif %}
+
+        {% if taxas.cdi %}
+        <div class="taxa-card taxa-cdi">
+            <div class="taxa-label">{{ taxas.cdi.nome }}</div>
+            <div class="taxa-valor">{{ taxas.cdi.valor }}<span class="taxa-unit">{{ taxas.cdi.unidade }}</span></div>
+            <div class="taxa-data">Atualizado: {{ taxas.cdi.data }}</div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endif %}
+
+<!-- ══ TESOURO DIRETO ══ -->
+{% if tesouro %}
+<div class="category-block">
+    <div class="mkt-header">
+        <div class="section-title">🏦 Tesouro Direto</div>
+    </div>
+    <div class="tesouro-grid">
+        {% for t in tesouro %}
+        <div class="tesouro-card {% if not t.disponivel %}unavailable{% endif %}">
+
+            <div class="tesouro-head">
+                <div class="tesouro-icon">
+                    {% if t.tipo == 'IPCA+' %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    {% elif t.tipo == 'Prefixado' %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    {% elif t.tipo == 'SELIC' %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    {% else %}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                    {% endif %}
+                </div>
+                <span class="tesouro-tipo">{{ t.tipo }}</span>
+            </div>
+
+            <div class="tesouro-nome">{{ t.nome }}</div>
+            <div class="tesouro-desc">{{ t.desc }}</div>
+            <div class="tesouro-divider"></div>
+
+            {% if t.disponivel and t.price %}
+            <div class="tesouro-price-row">
+                <div class="tesouro-price-wrap">
+                    <span class="tesouro-price-label">Preço ETF</span>
+                    <span class="tesouro-price">R$ {{ t.price }}</span>
+                </div>
+                <span class="tesouro-change {% if t.change_pct >= 0 %}up{% else %}down{% endif %}">
+                    {% if t.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ t.change_pct }}%
+                </span>
+            </div>
+            {% else %}
+            <div class="tesouro-unavailable-label">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Indisponível para compra
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
 <!-- ══ MARKET SECTIONS ══ -->
 
 <div id="section-all" class="section active">
@@ -134,12 +221,14 @@
         <div id="all_us-cards" class="cards">
             {% for item in overview.us %}
             <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
-                <div class="symbol">{{ item.symbol }}</div>
-                <div class="name">{{ item.name }}</div>
-                <div class="price">{{ item.currency }} {{ item.price }}</div>
-                <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">
-                    {% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%
+                <div class="mc-header">
+                    <div class="mc-logo">
+                        {% if item.logo_url %}<img src="{{ item.logo_url }}" alt="{{ item.symbol }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="mc-logo-fallback" style="display:none">{{ item.symbol|first }}</span>{% else %}<span class="mc-logo-fallback">{{ item.symbol|first }}</span>{% endif %}
+                    </div>
+                    <div class="mc-meta"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div></div>
                 </div>
+                <div class="price">{{ item.currency }} {{ item.price }}</div>
+                <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
             </a>
             {% endfor %}
         </div>
@@ -169,12 +258,14 @@
         <div id="all_br-cards" class="cards">
             {% for item in overview.br %}
             <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
-                <div class="symbol">{{ item.symbol }}</div>
-                <div class="name">{{ item.name }}</div>
-                <div class="price">R$ {{ item.price }}</div>
-                <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">
-                    {% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%
+                <div class="mc-header">
+                    <div class="mc-logo">
+                        {% if item.logo_url %}<img src="{{ item.logo_url }}" alt="{{ item.symbol }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="mc-logo-fallback" style="display:none">{{ item.symbol|first }}</span>{% else %}<span class="mc-logo-fallback">{{ item.symbol|first }}</span>{% endif %}
+                    </div>
+                    <div class="mc-meta"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div></div>
                 </div>
+                <div class="price">R$ {{ item.price }}</div>
+                <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
             </a>
             {% endfor %}
         </div>
@@ -203,12 +294,14 @@
         <div id="all_fii-cards" class="cards">
             {% for item in overview.fii %}
             <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
-                <div class="symbol">{{ item.symbol }}</div>
-                <div class="name">{{ item.name }}</div>
-                <div class="price">R$ {{ item.price }}</div>
-                <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">
-                    {% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%
+                <div class="mc-header">
+                    <div class="mc-logo">
+                        {% if item.logo_url %}<img src="{{ item.logo_url }}" alt="{{ item.symbol }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="mc-logo-fallback" style="display:none">{{ item.symbol|first }}</span>{% else %}<span class="mc-logo-fallback">{{ item.symbol|first }}</span>{% endif %}
+                    </div>
+                    <div class="mc-meta"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div></div>
                 </div>
+                <div class="price">R$ {{ item.price }}</div>
+                <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
             </a>
             {% endfor %}
         </div>
@@ -237,12 +330,14 @@
         <div id="all_crypto-cards" class="cards">
             {% for item in overview.crypto %}
             <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
-                <div class="symbol">{{ item.symbol }}</div>
-                <div class="name">{{ item.name }}</div>
-                <div class="price">$ {{ item.price }}</div>
-                <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">
-                    {% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%
+                <div class="mc-header">
+                    <div class="mc-logo">
+                        {% if item.logo_url %}<img src="{{ item.logo_url }}" alt="{{ item.symbol }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="mc-logo-fallback" style="display:none">{{ item.symbol|first }}</span>{% else %}<span class="mc-logo-fallback">{{ item.symbol|first }}</span>{% endif %}
+                    </div>
+                    <div class="mc-meta"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div></div>
                 </div>
+                <div class="price">$ {{ item.price }}</div>
+                <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
             </a>
             {% endfor %}
         </div>

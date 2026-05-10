@@ -106,7 +106,7 @@ body {
     display: block;
     font-size: 15px;
     font-weight: 900;
-    color: var(--white);
+    color: #fff;
     letter-spacing: -.4px;
     line-height: 1.2;
 }
@@ -147,7 +147,7 @@ body {
     min-width: 0;
     background: none;
     border: none;
-    color: var(--white);
+    color: #fff;
     font-size: 12.5px;
     font-family: inherit;
     outline: none;
@@ -161,6 +161,90 @@ body {
 }
 
 .sb-search-wrap:focus-within svg { color: var(--y); }
+
+/* ── Search autocomplete dropdown ── */
+.sb-suggest {
+    position: fixed;
+    background: #111318;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.6);
+    overflow: hidden;
+    z-index: 9999;
+    max-height: 340px;
+    width: 300px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,.1) transparent;
+}
+
+.sb-sug-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    text-decoration: none;
+    color: rgba(255,255,255,.75);
+    transition: background .15s;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+}
+
+.sb-sug-item:last-child { border-bottom: none; }
+.sb-sug-item:hover { background: rgba(255,214,0,.08); }
+
+.sb-sug-logo {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    object-fit: contain;
+    flex-shrink: 0;
+    background: rgba(255,255,255,.06);
+}
+
+.sb-sug-avatar {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    background: var(--y);
+    color: var(--black);
+    font-size: 11px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+
+.sb-sug-info { flex: 1; min-width: 0; }
+
+.sb-sug-symbol {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.2px;
+}
+
+.sb-sug-name {
+    display: block;
+    font-size: 10.5px;
+    color: rgba(255,255,255,.35);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sb-sug-type {
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 100px;
+    background: rgba(255,214,0,.12);
+    color: var(--y);
+    text-transform: uppercase;
+    letter-spacing: .3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
 
 /* ── Section label ── */
 .sb-section-label {
@@ -210,7 +294,7 @@ body {
 
 .sb-link:hover {
     background: rgba(255,255,255,.07);
-    color: var(--white);
+    color: #fff;
 }
 
 .sb-link:hover .sb-link-icon {
@@ -277,7 +361,7 @@ body {
     display: block;
     font-size: 12.5px;
     font-weight: 700;
-    color: var(--white);
+    color: #fff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -498,16 +582,55 @@ body.dark .ico-moon { display: block; }
     border-color: var(--y);
 }
 
-.market-card .symbol { font-size: 14px; font-weight: 800; color: var(--ink); letter-spacing: -.3px; }
-.market-card .name   { font-size: 11px; color: var(--muted-2); margin: 3px 0 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.market-card .price  { font-size: 18px; font-weight: 800; color: var(--ink); letter-spacing: -.5px; }
+/* Logo + header row inside card */
+.mc-header {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 10px;
+}
+
+.mc-logo {
+    width: 30px; height: 30px;
+    border-radius: 7px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.mc-logo img {
+    width: 26px; height: 26px;
+    object-fit: contain;
+}
+
+.mc-logo-fallback {
+    font-size: 12px;
+    font-weight: 900;
+    color: var(--black);
+    background: var(--y);
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+}
+
+.mc-meta { flex: 1; min-width: 0; }
+
+.market-card .symbol { font-size: 13px; font-weight: 800; color: var(--ink); letter-spacing: -.3px; line-height: 1.1; }
+.market-card .name   { font-size: 10.5px; color: var(--muted-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.market-card .price  { font-size: 17px; font-weight: 800; color: var(--ink); letter-spacing: -.5px; }
 .market-card .change {
     display: inline-flex;
     align-items: center;
     gap: 3px;
     font-size: 11px;
     font-weight: 700;
-    margin-top: 6px;
+    margin-top: 5px;
     padding: 2px 8px;
     border-radius: 100px;
 }
@@ -639,6 +762,7 @@ label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); 
 .stat-card { background: var(--white); border-radius: var(--r); padding: 16px 18px; border: 1.5px solid var(--line); box-shadow: var(--sh); }
 .stat-label { font-size: 10px; color: var(--muted-2); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; font-weight: 600; }
 .stat-value { font-size: 20px; font-weight: 800; color: var(--ink); letter-spacing: -.5px; }
+.stat-na    { color: var(--muted-2); font-size: 15px; }
 
 /* ══════════════════════════════════════════
    CHART
@@ -806,6 +930,186 @@ canvas { width: 100% !important; }
     font-size: 12px;
 }
 
+/* ── Taxas de Referência BCB ── */
+.taxas-row {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.taxa-card {
+    flex: 1;
+    min-width: 160px;
+    background: var(--white);
+    border: 1.5px solid var(--line);
+    border-radius: var(--r);
+    padding: 18px 22px;
+    box-shadow: var(--sh);
+    transition: border-color .2s, box-shadow .2s, transform .2s;
+}
+
+.taxa-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(255,214,0,.12);
+}
+
+.taxa-selic { border-top: 3px solid #16a34a; }
+.taxa-ipca  { border-top: 3px solid #f59e0b; }
+.taxa-cdi   { border-top: 3px solid #3b82f6; }
+
+.taxa-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.taxa-valor {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.taxa-unit {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+}
+
+.taxa-data {
+    font-size: 11px;
+    color: var(--muted-2);
+}
+
+body.dark .taxa-card { background: var(--white); border-color: var(--line); }
+
+/* ── Tesouro Direto ── */
+.tesouro-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 14px;
+    margin-bottom: 8px;
+}
+
+.tesouro-card {
+    background: var(--white);
+    border: 1.5px solid var(--line);
+    border-radius: var(--r);
+    padding: 20px 22px;
+    box-shadow: var(--sh);
+    position: relative;
+    overflow: hidden;
+    transition: border-color .2s, box-shadow .2s, transform .2s;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.tesouro-card:hover {
+    border-color: var(--y);
+    box-shadow: 0 6px 28px rgba(255,214,0,.12);
+    transform: translateY(-2px);
+}
+
+/* left accent bar */
+.tesouro-card::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 16px; bottom: 16px;
+    width: 3px;
+    background: var(--y);
+    border-radius: 0 3px 3px 0;
+}
+
+.tesouro-card.unavailable { opacity: .48; }
+.tesouro-card.unavailable::after { background: var(--muted-2); }
+
+.tesouro-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.tesouro-icon {
+    width: 38px; height: 38px;
+    border-radius: 9px;
+    background: var(--y);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(255,214,0,.3);
+}
+
+.tesouro-icon svg { color: var(--black); }
+
+.tesouro-tipo {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 800;
+    background: var(--y-10, rgba(255,214,0,.1));
+    color: #7a5e00;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    border: 1px solid rgba(255,214,0,.3);
+    align-self: flex-start;
+}
+
+.tesouro-card.unavailable .tesouro-tipo {
+    background: var(--bg);
+    color: var(--muted-2);
+    border-color: var(--line);
+}
+
+.tesouro-nome  { font-size: 15px; font-weight: 900; color: var(--ink); margin-bottom: 4px; letter-spacing: -.3px; }
+.tesouro-desc  { font-size: 12px; color: var(--muted-2); margin-bottom: 16px; line-height: 1.4; }
+
+.tesouro-divider { height: 1px; background: var(--line); margin-bottom: 14px; }
+
+.tesouro-price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.tesouro-price-wrap { display: flex; flex-direction: column; gap: 1px; }
+.tesouro-price-label { font-size: 10px; font-weight: 600; color: var(--muted-2); text-transform: uppercase; letter-spacing: .4px; }
+.tesouro-price { font-size: 22px; font-weight: 900; color: var(--ink); letter-spacing: -.8px; }
+
+.tesouro-change {
+    font-size: 12px; font-weight: 700;
+    padding: 4px 10px; border-radius: 100px;
+    display: flex; align-items: center; gap: 3px;
+}
+
+.tesouro-change.up   { background: #dcfce7; color: var(--green); }
+.tesouro-change.down { background: #fee2e2; color: var(--red); }
+
+.tesouro-unavailable-label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; color: var(--muted-2);
+    padding: 8px 10px;
+    background: var(--bg);
+    border-radius: var(--r-sm);
+    border: 1px solid var(--line);
+}
+
+body.dark .tesouro-card { background: var(--white); border-color: var(--line); }
+body.dark .tesouro-card:hover { border-color: var(--y); }
+body.dark .tesouro-tipo { color: var(--y); background: rgba(255,214,0,.08); }
+
 /* Bar chart */
 .bar-list { display: flex; flex-direction: column; gap: 10px; }
 
@@ -875,8 +1179,13 @@ body.dark .filter-btn { color: rgba(255,255,255,.3); }
 body.dark .filter-btn:hover { color: rgba(255,255,255,.8); }
 body.dark .filter-btn.active { color: var(--ink); }
 body.dark .market-card:hover { border-color: var(--y); }
-body.dark .market-card .change.up   { background: rgba(22,163,74,.15); color: #4ade80; }
-body.dark .market-card .change.down { background: rgba(220,38,38,.15); color: #f87171; }
+body.dark .market-card .change.up   { background: rgba(22,163,74,.15);  color: #4ade80; }
+body.dark .market-card .change.down { background: rgba(220,38,38,.15);  color: #f87171; }
+/* Garantir legibilidade no dark mode */
+body.dark .market-card .symbol { color: #f0f0f4; }
+body.dark .market-card .name   { color: rgba(255,255,255,.45); }
+body.dark .market-card .price  { color: #f0f0f4; }
+body.dark .mc-logo             { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.1); }
 body.dark th { background: rgba(255,255,255,.02); color: var(--muted); }
 body.dark tr:hover td { background: rgba(255,255,255,.02); }
 body.dark td a { color: var(--ink); }
@@ -897,3 +1206,109 @@ body.dark .badge-br     { background: rgba(21,128,61,.15);  color: #86efac; }
 body.dark .badge-fii    { background: rgba(161,98,7,.15);   color: #fde047; }
 body.dark .badge-crypto { background: rgba(124,58,237,.15); color: #c4b5fd; }
 body.dark .sb-theme { border-color: rgba(255,255,255,.06); }
+
+/* ── DARK MODE — Correções completas de legibilidade ──
+   Causa raiz: --white é redefinido para #141720 em dark mode (cor de fundo
+   dos cards), mas muitos elementos usam color:var(--white) para texto.
+   Solução: forçar #fff explícito em todos os casos problemáticos.
+   ─────────────────────────────────────────────────────────────────── */
+
+/* Botões com fundo escuro */
+body.dark .btn-add,
+body.dark .btn-monitor {
+    background: #22263a;
+    color: #f0f0f4;
+    border: 1px solid rgba(255,255,255,.12);
+}
+body.dark .btn-add:hover,
+body.dark .btn-monitor:hover {
+    background: #2a2f45;
+    box-shadow: 0 2px 8px rgba(0,0,0,.4);
+}
+body.dark .btn-detail  { color: #f0f0f4; background: #22263a; }
+body.dark .btn-detail:hover { background: #2a2f45; }
+
+/* Botões coloridos (pastel vira escuro) */
+body.dark .btn-remove  { background: rgba(220,38,38,.15);  color: #f87171; border: 1px solid rgba(220,38,38,.2); }
+body.dark .btn-toggle  { background: rgba(234,179,8,.12);  color: #fbbf24; border: 1px solid rgba(234,179,8,.18); }
+
+/* View toggle hover */
+body.dark .view-btn:hover { color: #e4e4e8; border-color: rgba(255,255,255,.3); }
+
+/* Search page button */
+body.dark .search-hero button { background: #22263a; color: #f0f0f4; }
+body.dark .search-hero button:hover { background: #2a2f45; }
+body.dark .search-hero input { background: rgba(255,255,255,.04); color: #e4e4e8; border-color: rgba(255,255,255,.1); }
+
+/* Result cards */
+body.dark .result-symbol { color: #e4e4e8; }
+body.dark .result-name   { color: rgba(255,255,255,.45); }
+
+/* Section & chart titles */
+body.dark .section-title { color: #d8d8e0; }
+body.dark .chart-title   { color: #d8d8e0; }
+
+/* Stat cards */
+body.dark .stat-value  { color: #e4e4e8; }
+body.dark .stat-label  { color: rgba(255,255,255,.38); }
+body.dark .stat-na     { color: rgba(255,255,255,.3); }
+
+/* Tables */
+body.dark td           { color: #d0d0d8; }
+body.dark th           { color: rgba(255,255,255,.38); }
+
+/* Breadcrumb */
+body.dark .breadcrumb     { color: rgba(255,255,255,.35); }
+body.dark .breadcrumb a   { color: #d0d0d8; }
+
+/* Filter bar active */
+body.dark .filter-btn.active { color: #f0f0f4; }
+
+/* Tesouro cards */
+body.dark .tesouro-nome        { color: #e4e4e8; }
+body.dark .tesouro-price       { color: #e4e4e8; }
+body.dark .tesouro-desc        { color: rgba(255,255,255,.38); }
+body.dark .tesouro-price-label { color: rgba(255,255,255,.38); }
+
+/* Charts bar */
+body.dark .bar-name { color: #e4e4e8; }
+
+/* Summary stats */
+body.dark .mkt-stat-value { color: #e4e4e8; }
+
+/* stock_detail — company card */
+body.dark .company-card  { background: #141720; border-color: rgba(255,255,255,.08); }
+body.dark .company-name  { color: #e4e4e8; }
+body.dark .company-sub   { color: rgba(255,255,255,.35); }
+body.dark .company-tag   { background: var(--y); color: var(--black); }
+body.dark .company-tag-gray { background: rgba(255,255,255,.07); color: rgba(255,255,255,.5); border-color: rgba(255,255,255,.1); }
+
+/* stock_detail — indicator cards */
+body.dark .ind-card    { background: #141720; border-color: rgba(255,255,255,.08); }
+body.dark .ind-label   { color: rgba(255,255,255,.35); }
+body.dark .ind-value   { color: #e4e4e8; }
+body.dark .ind-value.up   { color: #4ade80; }
+body.dark .ind-value.down { color: #f87171; }
+body.dark .ind-tab     { color: rgba(255,255,255,.4); }
+body.dark .ind-tab:hover  { color: #e4e4e8; }
+body.dark .ind-tab.active { color: #e4e4e8; border-bottom-color: var(--y); }
+body.dark .ind-tabs    { border-bottom-color: rgba(255,255,255,.1); }
+
+/* stock_detail — balance */
+body.dark .balance-card  { background: #141720; border-color: rgba(255,255,255,.08); }
+body.dark .balance-label { color: rgba(255,255,255,.35); }
+body.dark .balance-value { color: #e4e4e8; }
+
+/* Portfolio / stock list */
+body.dark .status-paused { color: rgba(255,255,255,.25); }
+body.dark .hint          { color: rgba(255,255,255,.28); }
+body.dark label          { color: rgba(255,255,255,.45); }
+
+/* General card & form text */
+body.dark .card        { background: #141720; border-color: rgba(255,255,255,.07); }
+body.dark .card p,
+body.dark .card strong { color: rgba(255,255,255,.7); }
+
+/* Badges (generic) */
+body.dark .badge-high  { background: rgba(22,163,74,.15);  color: #4ade80; }
+body.dark .badge-low   { background: rgba(220,38,38,.15);  color: #f87171; }

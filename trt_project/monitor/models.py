@@ -8,11 +8,13 @@ class Stock(models.Model):
         ('fii',      'Fundo Imobiliário'),
         ('crypto',   'Criptomoeda'),
     ]
-    symbol    = models.CharField(max_length=15, unique=True)
-    name      = models.CharField(max_length=100, blank=True)
-    tipo      = models.CharField(max_length=10, choices=TIPO_CHOICES, default='stock_us')
-    is_active = models.BooleanField(default=True)
-    added_at  = models.DateTimeField(default=timezone.now)
+    symbol         = models.CharField(max_length=15, unique=True)
+    name           = models.CharField(max_length=100, blank=True)
+    tipo           = models.CharField(max_length=10, choices=TIPO_CHOICES, default='stock_us')
+    is_active      = models.BooleanField(default=True)
+    added_at       = models.DateTimeField(default=timezone.now)
+    threshold_high = models.DecimalField(max_digits=5, decimal_places=2, default=5.00)
+    threshold_low  = models.DecimalField(max_digits=5, decimal_places=2, default=5.00)
 
     def display_symbol(self):
         return self.symbol.replace('.SA', '').replace('-USD', '')
@@ -21,10 +23,8 @@ class Stock(models.Model):
         return self.symbol
 
 class UserSettings(models.Model):
-    monitoring_interval  = models.PositiveIntegerField(default=60)
-    alert_threshold_high = models.DecimalField(max_digits=5, decimal_places=2, default=5.00)
-    alert_threshold_low  = models.DecimalField(max_digits=5, decimal_places=2, default=5.00)
-    alert_email          = models.EmailField(blank=True)
+    monitoring_interval = models.PositiveIntegerField(default=60)
+    alert_email         = models.EmailField(blank=True)
 
     def __str__(self):
         return f"Configurações (intervalo: {self.monitoring_interval}s)"

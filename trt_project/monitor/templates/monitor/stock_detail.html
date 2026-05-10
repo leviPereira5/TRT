@@ -230,13 +230,63 @@ body.dark .company-tag-gray { background: rgba(255,255,255,.06); border-color: r
 
 <!-- ══ PRICE STATS ══ -->
 <div class="stats-grid" style="margin-bottom:20px">
-    <div class="stat-card"><div class="stat-label">Mín. hoje</div><div class="stat-value">{{ stats.day_low }}</div></div>
-    <div class="stat-card"><div class="stat-label">Máx. hoje</div><div class="stat-value">{{ stats.day_high }}</div></div>
-    <div class="stat-card"><div class="stat-label">Mín. 52 sem.</div><div class="stat-value">{{ stats.week52_low }}</div></div>
-    <div class="stat-card"><div class="stat-label">Máx. 52 sem.</div><div class="stat-value">{{ stats.week52_high }}</div></div>
-    <div class="stat-card"><div class="stat-label">Volume</div><div class="stat-value" style="font-size:15px">{{ stats.volume }}</div></div>
-    <div class="stat-card"><div class="stat-label">Vol. Médio</div><div class="stat-value" style="font-size:15px">{{ stats.avg_volume }}</div></div>
+    <div class="stat-card">
+        <div class="stat-label">Fecho Anterior</div>
+        <div class="stat-value">{{ stats.prev_close }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Abertura</div>
+        <div class="stat-value">{{ stats.open_price }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Mín. hoje</div>
+        <div class="stat-value {% if stats.day_low == '—' %}stat-na{% endif %}">{{ stats.day_low }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Máx. hoje</div>
+        <div class="stat-value {% if stats.day_high == '—' %}stat-na{% endif %}">{{ stats.day_high }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Mín. 52 sem.</div>
+        <div class="stat-value {% if stats.week52_low == '—' %}stat-na{% endif %}">{{ stats.week52_low }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Máx. 52 sem.</div>
+        <div class="stat-value {% if stats.week52_high == '—' %}stat-na{% endif %}">{{ stats.week52_high }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Bid / Ask</div>
+        <div class="stat-value" style="font-size:14px">{{ stats.bid }} / {{ stats.ask }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Volume</div>
+        <div class="stat-value" style="font-size:15px">
+            {{ stats.volume }}
+            {% if stats.volume == '—' and stats.avg_volume != '—' %}
+                <span style="font-size:11px;color:var(--muted-2);font-weight:500;display:block;margin-top:2px">Méd: {{ stats.avg_volume }}</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Vol. Médio</div>
+        <div class="stat-value" style="font-size:15px">{{ stats.avg_volume }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Média 50 dias</div>
+        <div class="stat-value">{{ stats.ma50 }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Média 200 dias</div>
+        <div class="stat-value">{{ stats.ma200 }}</div>
+    </div>
 </div>
+
+{% if stats.day_low == '—' and stats.day_high == '—' %}
+<div style="font-size:12px;color:var(--muted-2);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:9px 14px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Dados intradiários indisponíveis — o mercado pode estar fechado ou os dados ainda não foram atualizados.
+</div>
+{% endif %}
 
 <!-- ══ CHART ══ -->
 {% if chart_data %}

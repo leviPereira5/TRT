@@ -31,14 +31,15 @@
         </div>
     </a>
 
-    <!-- Search -->
-    <div class="sb-search-wrap">
+    <!-- Search with autocomplete -->
+    <div class="sb-search-wrap" id="sb-search-wrap">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
-        <form method="get" action="/search/">
-            <input type="text" name="q" placeholder="Pesquisar ativo..." autocomplete="off">
+        <form method="get" action="/search/" autocomplete="off">
+            <input type="text" name="q" id="sb-search-input" placeholder="Pesquisar ativo..." autocomplete="off">
         </form>
+        <div class="sb-suggest" id="sb-suggest" style="display:none"></div>
     </div>
 
     <!-- Divider -->
@@ -177,6 +178,60 @@
             a.classList.add('active');
         }
     });
+
+    /* Sidebar search autocomplete */
+    var sbInput   = document.getElementById('sb-search-input');
+    var sbSuggest = document.getElementById('sb-suggest');
+    var sbWrap    = document.getElementById('sb-search-wrap');
+    var sbTimer   = null;
+
+    if (sbInput && sbSuggest) {
+        function positionSuggest() {
+            var rect = sbWrap.getBoundingClientRect();
+            sbSuggest.style.top  = rect.top + 'px';
+            sbSuggest.style.left = (rect.right + 8) + 'px';
+        }
+
+        sbInput.addEventListener('input', function () {
+            clearTimeout(sbTimer);
+            var q = sbInput.value.trim();
+            if (q.length < 2) { sbSuggest.style.display = 'none'; return; }
+            sbTimer = setTimeout(function () {
+                fetch('/search/suggest/?q=' + encodeURIComponent(q))
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (!data.results || data.results.length === 0) {
+                            sbSuggest.style.display = 'none'; return;
+                        }
+                        sbSuggest.innerHTML = data.results.map(function(r) {
+                            var sym  = r.symbol.replace('.SA','').replace('-USD','');
+                            var logo = 'https://assets.parqet.com/logos/symbol/' + sym + '?format=png';
+                            return '<a href="' + r.url + '" class="sb-sug-item">' +
+                                '<img class="sb-sug-logo" src="' + logo + '" alt="" ' +
+                                    'onerror="this.onerror=null;this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">' +
+                                '<span class="sb-sug-avatar" style="display:none">' + sym.charAt(0) + '</span>' +
+                                '<div class="sb-sug-info">' +
+                                    '<span class="sb-sug-symbol">' + r.symbol + '</span>' +
+                                    '<span class="sb-sug-name">' + (r.name || '') + '</span>' +
+                                '</div>' +
+                                '<span class="sb-sug-type">' + (r.tipo || '') + '</span>' +
+                            '</a>';
+                        }).join('');
+                        positionSuggest();
+                        sbSuggest.style.display = 'block';
+                    })
+                    .catch(function() { sbSuggest.style.display = 'none'; });
+            }, 280);
+        });
+
+        sbInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') { sbSuggest.style.display = 'none'; sbInput.value = ''; }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (sbWrap && !sbWrap.contains(e.target)) sbSuggest.style.display = 'none';
+        });
+    }
 })();
 </script>
 

@@ -2,18 +2,110 @@
 {% block title %}TRT — Configurações{% endblock %}
 
 {% block content %}
-<div class="card" style="max-width:600px;margin:0 auto">
-    <div class="section-title">Configurações de alerta</div>
-    <form method="post">
-        {% csrf_token %}
-        {% for field in form %}
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {% if field.name == 'alert_email' %}<div class="hint">Receberás um email quando um alerta for gerado.</div>{% endif %}
-            {% if field.name == 'monitoring_interval' %}<div class="hint">Entre 1 e 3600 segundos.</div>{% endif %}
-            {% if field.errors %}<p style="color:red;font-size:13px">{{ field.errors.as_text }}</p>{% endif %}
-        {% endfor %}
-        <button class="btn btn-primary" type="submit">Guardar configurações</button>
-    </form>
+<div style="max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:20px;">
+
+    <!-- Mensagens -->
+    {% for msg in messages %}
+    <div class="msg-{{ msg.tags }}">{{ msg }}</div>
+    {% endfor %}
+
+    <!-- ── Configurações de Alerta ── -->
+    <div class="card">
+        <div class="section-title">Configurações de Alerta</div>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.name == 'alert_email' %}
+                    <div class="hint">Email que receberá as notificações quando um alerta for gerado.</div>
+                {% endif %}
+                {% if field.name == 'monitoring_interval' %}
+                    <div class="hint">Intervalo em segundos entre cada ciclo de monitorização (1 – 3600 s).</div>
+                {% endif %}
+                {% if field.name == 'alert_threshold_high' %}
+                    <div class="hint">Percentagem de subida que dispara um alerta de alta.</div>
+                {% endif %}
+                {% if field.name == 'alert_threshold_low' %}
+                    <div class="hint">Percentagem de descida que dispara um alerta de baixa.</div>
+                {% endif %}
+                {% if field.errors %}<p style="color:#dc2626;font-size:13px;margin-top:4px">{{ field.errors.as_text }}</p>{% endif %}
+            {% endfor %}
+            <button class="btn btn-primary" type="submit">Guardar configurações</button>
+        </form>
+    </div>
+
+    <!-- ── Estado do Email ── -->
+    <div class="card">
+        <div class="section-title">Estado do Email</div>
+
+        {% if settings.alert_email %}
+        <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;margin-bottom:16px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div>
+                <div style="font-size:13px;font-weight:700;color:#166534;">Email configurado</div>
+                <div style="font-size:12px;color:#15803d;">{{ settings.alert_email }}</div>
+            </div>
+        </div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">
+            Clica em <strong>Enviar email de teste</strong> para confirmar que o sistema de alertas está a funcionar corretamente.
+        </p>
+        <a href="{% url 'test_email' %}" class="btn btn-add" style="display:inline-flex;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Enviar email de teste
+        </a>
+        {% else %}
+        <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;margin-bottom:16px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div>
+                <div style="font-size:13px;font-weight:700;color:#92400e;">Email não configurado</div>
+                <div style="font-size:12px;color:#b45309;">Configura o email acima para receber alertas.</div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Instruções SMTP -->
+        <details style="margin-top:16px;">
+            <summary style="font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;user-select:none;letter-spacing:.3px;text-transform:uppercase;">
+                Como configurar o envio de emails (Gmail)
+            </summary>
+            <div style="margin-top:12px;font-size:13px;color:var(--muted);line-height:1.7;border-left:3px solid var(--y);padding-left:14px;">
+                <p style="margin-bottom:8px;">O sistema usa SMTP para enviar alertas. Para o Gmail, segue estes passos:</p>
+                <ol style="padding-left:18px;display:flex;flex-direction:column;gap:6px;">
+                    <li>Ativa a <strong>Verificação em 2 passos</strong> na tua conta Google.</li>
+                    <li>Em <strong>Segurança → Passwords de aplicações</strong>, cria uma nova password para "TRT Invest".</li>
+                    <li>No ficheiro <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px;">.env</code> do projeto, preenche:<br>
+                        <code style="display:block;background:var(--bg);padding:8px 12px;border-radius:6px;font-size:12px;margin-top:6px;white-space:pre;">EMAIL_HOST_USER=o-teu@gmail.com
+EMAIL_HOST_PASSWORD=xxxx xxxx xxxx xxxx</code>
+                    </li>
+                    <li>Reinicia o servidor Django depois de guardar o <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px;">.env</code>.</li>
+                </ol>
+            </div>
+        </details>
+    </div>
+
+    <!-- ── Monitorização ── -->
+    <div class="card">
+        <div class="section-title">Monitorização</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px;">
+            O ciclo de monitorização verifica os preços dos ativos ativos e dispara alertas quando os limiares são atingidos.
+            Podes executá-lo manualmente ou iniciar o daemon contínuo via terminal.
+        </p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <a href="{% url 'run_monitor' %}" class="btn btn-add">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Executar ciclo agora
+            </a>
+            <a href="{% url 'alert_history' %}" class="btn btn-monitor">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                Ver histórico de alertas
+            </a>
+        </div>
+        <div style="margin-top:14px;background:var(--bg);border-radius:8px;padding:12px 14px;">
+            <p style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Daemon contínuo (terminal)</p>
+            <code style="font-size:12px;color:var(--ink);">python manage.py run_monitor</code>
+        </div>
+    </div>
+
 </div>
 {% endblock %}

@@ -10,6 +10,14 @@ from .models import Stock, StockPrice, Alert, UserSettings
 logger = logging.getLogger(__name__)
 
 FEATURED_US = ['AAPL','MSFT','GOOGL','AMZN','TSLA','NVDA','META','BRK-B']
+
+# ETFs B3 que aproximam os índices do Tesouro Direto
+TESOURO_ETFS = [
+    {'nome': 'Tesouro IPCA+',      'etf': 'IMAB11.SA', 'tipo': 'IPCA+',      'desc': 'Protegido contra inflação'},
+    {'nome': 'Tesouro Prefixado',   'etf': 'B5P211.SA', 'tipo': 'Prefixado',  'desc': 'Taxa fixa pré-definida'},
+    {'nome': 'Tesouro SELIC',       'etf': 'TESD11.SA', 'tipo': 'SELIC',      'desc': 'Acompanha a taxa SELIC'},
+    {'nome': 'Tesouro IGPM+',       'etf': 'XFIX11.SA', 'tipo': 'IGP-M+',     'desc': 'Indexado ao IGP-M'},
+]
 FEATURED_BR = ['PETR4.SA','VALE3.SA','ITUB4.SA','BBDC4.SA','ABEV3.SA','WEGE3.SA']
 FEATURED_FII = ['HGLG11.SA','XPML11.SA','KNRI11.SA','MXRF11.SA','VISC11.SA']
 FEATURED_CRYPTO = ['BTC-USD','ETH-USD','SOL-USD','BNB-USD','XRP-USD','ADA-USD','AVAX-USD','DOGE-USD']
@@ -39,18 +47,66 @@ def _fetch_group(symbols, categoria):
             price = info.get("regularMarketPrice") or info.get("currentPrice") or info.get("previousClose")
             prev  = info.get("previousClose")
             change_pct = round(((price - prev) / prev) * 100, 2) if price and prev else 0
+            clean = symbol.replace('.SA', '').replace('-USD', '')
             entry = {
-                'symbol':     symbol.replace('.SA', '').replace('-USD', ''),
+                'symbol':     clean,
                 'symbol_yf':  symbol,
                 'name':       info.get('shortName', symbol),
                 'price':      round(price, 2) if price else '—',
                 'change_pct': change_pct,
                 'currency':   info.get('currency', ''),
+                'logo_url':   info.get('logo_url', ''),
             }
             result.append(entry)
         except Exception as e:
             logger.warning(f"Erro ao obter {symbol}: {e}")
     return result
+
+def fetch_taxas_bcb():
+    import requests
+    series = {
+        'selic': (432,  'Meta SELIC',  '% a.a.'),
+        'ipca':  (433,  'IPCA',        '% mês'),
+        'cdi':   (4389, 'CDI',         '% a.a.'),
+    }
+    taxas = {}
+    for chave, (codigo, nome, unidade) in series.items():
+        try:
+            url  = f"https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados/ultimos/1?formato=json"
+            resp = requests.get(url, timeout=5)
+            data = resp.json()
+            if data:
+                taxas[chave] = {
+                    'nome':    nome,
+                    'valor':   data[0]['valor'],
+                    'data':    data[0]['data'],
+                    'unidade': unidade,
+                }
+        except Exception:
+            taxas[chave] = None
+    return taxas
+
+
+def fetch_tesouro():
+    result = []
+    for item in TESOURO_ETFS:
+        entry = dict(item)
+        try:
+            t    = yf.Ticker(item['etf'])
+            info = t.info
+            price = info.get('regularMarketPrice') or info.get('currentPrice') or info.get('previousClose')
+            prev  = info.get('previousClose')
+            change_pct = round(((price - prev) / prev) * 100, 2) if price and prev else 0
+            entry['price']      = round(price, 2) if price else None
+            entry['change_pct'] = change_pct
+            entry['disponivel'] = True
+        except Exception:
+            entry['price']      = None
+            entry['change_pct'] = 0
+            entry['disponivel'] = False
+        result.append(entry)
+    return result
+
 
 def fetch_market_overview():
     return {
@@ -100,9 +156,9 @@ def send_alert_email(alert, settings):
         logger.error(f"Erro ao enviar email: {e}")
 
 def check_and_alert(stock, variation, new_price, settings):
-    if variation >= settings.alert_threshold_high:
+    if variation >= stock.threshold_high:
         direction = 'high'
-    elif variation <= -settings.alert_threshold_low:
+    elif variation <= -stock.threshold_low:
         direction = 'low'
     else:
         return None
