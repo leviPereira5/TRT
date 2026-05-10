@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Stock, UserSettings, Alert
 from .forms import StockForm, SettingsForm
-from .services import run_monitoring_cycle, fetch_market_overview, fetch_price, fetch_tesouro, fetch_taxas_bcb
+from .services import run_monitoring_cycle, fetch_market_overview, fetch_price, fetch_tesouro, fetch_taxas_bcb, fetch_top_movers
 
 
 def register_view(request):
@@ -93,10 +93,28 @@ def guest_login(request):
 
 @login_required
 def home(request):
-    overview = fetch_market_overview()
-    tesouro  = fetch_tesouro()
-    taxas    = fetch_taxas_bcb()
-    return render(request, 'monitor/home.html', {'overview': overview, 'tesouro': tesouro, 'taxas': taxas})
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=4) as ex:
+        f_overview   = ex.submit(fetch_market_overview)
+        f_tesouro    = ex.submit(fetch_tesouro)
+        f_taxas      = ex.submit(fetch_taxas_bcb)
+        f_top_movers = ex.submit(fetch_top_movers)
+        overview   = f_overview.result()
+        tesouro    = f_tesouro.result()
+        taxas      = f_taxas.result()
+        top_movers = f_top_movers.result()
+    top10_sections = [
+        ('us',     top_movers.get('us', []),     'USD'),
+        ('br',     top_movers.get('br', []),     'R$'),
+        ('fii',    top_movers.get('fii', []),    'R$'),
+        ('crypto', top_movers.get('crypto', []), 'auto'),
+    ]
+    return render(request, 'monitor/home.html', {
+        'overview':       overview,
+        'tesouro':        tesouro,
+        'taxas':          taxas,
+        'top10_sections': top10_sections,
+    })
 
 
 @login_required

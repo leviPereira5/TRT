@@ -13,11 +13,13 @@
     --black:   #0a0a0a;
     --ink:     #111113;
     --ink-2:   #1c1c1f;
+    --text:    #111113;
     --muted:   #6b6b72;
     --muted-2: #a0a0a8;
     --line:    #e8e8ec;
     --bg:      #f5f5f7;
     --white:   #ffffff;
+    --surface: #ffffff;
     --green:   #16a34a;
     --red:     #dc2626;
     --r:       10px;
@@ -1108,7 +1110,148 @@ body.dark .taxa-card { background: var(--white); border-color: var(--line); }
 
 body.dark .tesouro-card { background: var(--white); border-color: var(--line); }
 body.dark .tesouro-card:hover { border-color: var(--y); }
-body.dark .tesouro-tipo { color: var(--y); background: rgba(255,214,0,.08); }
+body.dark .tesouro-icon            { background: var(--black); box-shadow: 0 2px 10px rgba(0,0,0,.4); }
+body.dark .tesouro-icon svg        { color: var(--y); }
+body.dark .tesouro-tipo            { color: var(--y); background: rgba(255,214,0,.08); border-color: rgba(255,214,0,.2); }
+body.dark .tesouro-card.unavailable .tesouro-tipo { background: rgba(255,255,255,.05); color: rgba(255,255,255,.35); border-color: rgba(255,255,255,.1); }
+
+/* ── Top 10 do Momento ── */
+.top10-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.top10-tab {
+    padding: 8px 18px;
+    border-radius: 100px;
+    border: 1.5px solid var(--black);
+    background: transparent;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--black);
+    cursor: pointer;
+    transition: all .18s;
+    font-family: inherit;
+}
+
+.top10-tab:hover {
+    background: var(--y-10);
+    border-color: var(--y);
+    color: var(--black);
+}
+
+.top10-tab.active {
+    background: var(--black);
+    border-color: var(--black);
+    color: var(--y);
+}
+
+.top10-panel { display: none; flex-direction: column; gap: 2px; }
+.top10-panel.active { display: flex; }
+
+.top10-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: background .15s, border-color .15s;
+}
+
+.top10-row:hover {
+    background: var(--y-10);
+    border-color: var(--y-20);
+}
+
+.top10-rank {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--muted-2);
+    width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.top10-rank.gold {
+    background: var(--black);
+    color: var(--y);
+    border-radius: 6px;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+}
+
+.top10-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.top10-symbol {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--black);
+}
+
+.top10-name {
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.top10-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    flex-shrink: 0;
+}
+
+.top10-price {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--black);
+}
+
+.top10-change {
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 100px;
+}
+
+.top10-change.up   { background: var(--black); color: var(--y); }
+.top10-change.down { background: var(--bg);    color: var(--muted); border: 1px solid var(--line); }
+
+.top10-empty {
+    font-size: 13px;
+    color: var(--muted);
+    padding: 20px 14px;
+    text-align: center;
+}
+
+body.dark .top10-tab            { border-color: rgba(255,255,255,.18); color: rgba(255,255,255,.7); }
+body.dark .top10-tab:hover      { background: var(--y-10); border-color: var(--y); color: #e4e4e8; }
+body.dark .top10-tab.active     { background: var(--y); border-color: var(--y); color: #0a0a0a; }
+body.dark .top10-row:hover      { background: var(--y-10); border-color: var(--y-20); }
+body.dark .top10-rank           { color: rgba(255,255,255,.35); }
+body.dark .top10-rank.gold      { background: var(--y); color: #0a0a0a; }
+body.dark .top10-symbol         { color: #e4e4e8; }
+body.dark .top10-name           { color: rgba(255,255,255,.45); }
+body.dark .top10-price          { color: #e4e4e8; }
+body.dark .top10-change.up      { background: var(--y); color: #0a0a0a; }
+body.dark .top10-change.down    { background: rgba(255,255,255,.06); color: rgba(255,255,255,.5); border-color: transparent; }
 
 /* Bar chart */
 .bar-list { display: flex; flex-direction: column; gap: 10px; }
@@ -1165,10 +1308,12 @@ body.dark .tesouro-tipo { color: var(--y); background: rgba(255,214,0,.08); }
 body.dark {
     --bg:      #0d0f14;
     --ink:     #e4e4e8;
-    --muted:   #6b6b75;
-    --muted-2: #9090a0;
-    --line:    rgba(255,255,255,.08);
-    --white:   #141720;
+    --text:    #e4e4e8;
+    --muted:   #8a8a95;
+    --muted-2: #b0b0bc;
+    --line:    rgba(255,255,255,.09);
+    --white:   #1a1d25;
+    --surface: #1a1d25;
     --sh:      0 1px 3px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.2);
     --sh-md:   0 4px 24px rgba(0,0,0,.35);
 }
@@ -1178,13 +1323,13 @@ body.dark .filter-bar { background: #0d0f14; border-bottom-color: rgba(255,255,2
 body.dark .filter-btn { color: rgba(255,255,255,.3); }
 body.dark .filter-btn:hover { color: rgba(255,255,255,.8); }
 body.dark .filter-btn.active { color: var(--ink); }
-body.dark .market-card:hover { border-color: var(--y); }
-body.dark .market-card .change.up   { background: rgba(22,163,74,.15);  color: #4ade80; }
-body.dark .market-card .change.down { background: rgba(220,38,38,.15);  color: #f87171; }
-/* Garantir legibilidade no dark mode */
-body.dark .market-card .symbol { color: #f0f0f4; }
-body.dark .market-card .name   { color: rgba(255,255,255,.45); }
-body.dark .market-card .price  { color: #f0f0f4; }
+body.dark .market-card            { background: var(--surface); border-color: rgba(255,255,255,.09); }
+body.dark .market-card:hover      { border-color: var(--y); box-shadow: 0 6px 24px rgba(255,214,0,.08); }
+body.dark .market-card .change.up   { background: rgba(255,214,0,.12); color: var(--y); }
+body.dark .market-card .change.down { background: rgba(255,255,255,.06); color: rgba(255,255,255,.5); }
+body.dark .market-card .symbol { color: #e4e4e8; }
+body.dark .market-card .name   { color: rgba(255,255,255,.4); }
+body.dark .market-card .price  { color: #e4e4e8; }
 body.dark .mc-logo             { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.1); }
 body.dark th { background: rgba(255,255,255,.02); color: var(--muted); }
 body.dark tr:hover td { background: rgba(255,255,255,.02); }
@@ -1265,16 +1410,45 @@ body.dark .breadcrumb a   { color: #d0d0d8; }
 body.dark .filter-btn.active { color: #f0f0f4; }
 
 /* Tesouro cards */
+body.dark .tesouro-card        { background: var(--surface); border-color: rgba(255,255,255,.1); }
 body.dark .tesouro-nome        { color: #e4e4e8; }
 body.dark .tesouro-price       { color: #e4e4e8; }
-body.dark .tesouro-desc        { color: rgba(255,255,255,.38); }
-body.dark .tesouro-price-label { color: rgba(255,255,255,.38); }
+body.dark .tesouro-desc        { color: rgba(255,255,255,.45); }
+body.dark .tesouro-price-label { color: rgba(255,255,255,.4); }
+body.dark .tesouro-change.up   { background: rgba(255,214,0,.12); color: var(--y); }
+body.dark .tesouro-change.down { background: rgba(255,255,255,.06); color: rgba(255,255,255,.5); }
+body.dark .tesouro-unavailable-label { color: rgba(255,255,255,.35); }
+body.dark .tesouro-divider     { background: rgba(255,255,255,.07); }
+
+/* Taxa de referência cards (BCB) */
+body.dark .taxa-card           { background: var(--surface); border-color: rgba(255,255,255,.1); }
+body.dark .taxa-label          { color: rgba(255,255,255,.45); }
+body.dark .taxa-valor          { color: #e4e4e8; }
+body.dark .taxa-unit           { color: rgba(255,255,255,.45); }
+body.dark .taxa-data           { color: rgba(255,255,255,.3); }
 
 /* Charts bar */
 body.dark .bar-name { color: #e4e4e8; }
+body.dark .bar-pct  { }
+body.dark .chart-box { background: var(--surface); border-color: rgba(255,255,255,.09); }
+body.dark .chart-box-title { color: rgba(255,255,255,.55); }
+body.dark .legend-item { color: rgba(255,255,255,.65); }
+body.dark .legend-count { color: rgba(255,255,255,.4); }
 
 /* Summary stats */
-body.dark .mkt-stat-value { color: #e4e4e8; }
+body.dark .mkt-stat            { background: var(--surface); border-color: rgba(255,255,255,.09); }
+body.dark .mkt-stat-value      { color: #e4e4e8; }
+body.dark .mkt-stat-label      { color: rgba(255,255,255,.4); }
+body.dark .mkt-header .section-title { color: rgba(255,255,255,.65); }
+
+/* stock_detail — hero */
+body.dark .hero          { background: #0d1117; color: #e4e4e8; border: 1px solid rgba(255,255,255,.07); }
+body.dark .hero-symbol   { color: #e4e4e8; }
+body.dark .hero-name     { color: rgba(255,255,255,.45); }
+body.dark .hero-price    { color: #e4e4e8; }
+body.dark .hero-change   { color: #e4e4e8; }
+body.dark .hero .up      { color: var(--y); }
+body.dark .hero .down    { color: #f87171; }
 
 /* stock_detail — company card */
 body.dark .company-card  { background: #141720; border-color: rgba(255,255,255,.08); }
@@ -1305,10 +1479,24 @@ body.dark .hint          { color: rgba(255,255,255,.28); }
 body.dark label          { color: rgba(255,255,255,.45); }
 
 /* General card & form text */
-body.dark .card        { background: #141720; border-color: rgba(255,255,255,.07); }
+body.dark .card          { background: var(--surface); border-color: rgba(255,255,255,.09); }
 body.dark .card p,
-body.dark .card strong { color: rgba(255,255,255,.7); }
+body.dark .card strong   { color: rgba(255,255,255,.75); }
+body.dark .card label    { color: rgba(255,255,255,.5); }
+body.dark .card code     { background: rgba(255,255,255,.06); color: #e4e4e8; }
+body.dark .card a        { color: var(--y); }
+
+/* Stat cards (stock detail) */
+body.dark .stat-card     { background: var(--surface); border-color: rgba(255,255,255,.09); }
 
 /* Badges (generic) */
-body.dark .badge-high  { background: rgba(22,163,74,.15);  color: #4ade80; }
-body.dark .badge-low   { background: rgba(220,38,38,.15);  color: #f87171; }
+body.dark .badge-high    { background: rgba(255,214,0,.12); color: var(--y); }
+body.dark .badge-low     { background: rgba(255,255,255,.06); color: rgba(255,255,255,.55); }
+body.dark .badge-ETF     { background: rgba(255,214,0,.10); color: var(--y); }
+
+/* Market avg pills */
+body.dark .mkt-avg.up    { background: rgba(255,214,0,.12); color: var(--y); }
+body.dark .mkt-avg.down  { background: rgba(255,255,255,.06); color: rgba(255,255,255,.5); }
+
+/* Table row hover */
+body.dark tr:hover td    { background: rgba(255,255,255,.025); }

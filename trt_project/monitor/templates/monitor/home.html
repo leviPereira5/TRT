@@ -205,6 +205,42 @@
 </div>
 {% endif %}
 
+<!-- ══ TOP 10 DO MOMENTO ══ -->
+<div class="category-block">
+    <div class="mkt-header">
+        <div class="section-title">🔥 Top 10 do Momento</div>
+    </div>
+
+    <div class="top10-tabs">
+        <button class="top10-tab active" onclick="showTop10('us',this)">🇺🇸 EUA</button>
+        <button class="top10-tab" onclick="showTop10('br',this)">🇧🇷 Brasil</button>
+        <button class="top10-tab" onclick="showTop10('fii',this)">🏢 FIIs</button>
+        <button class="top10-tab" onclick="showTop10('crypto',this)">₿ Crypto</button>
+    </div>
+
+    {% for key, items, currency in top10_sections %}
+    <div id="top10-{{ key }}" class="top10-panel {% if key == 'us' %}active{% endif %}">
+        {% for item in items %}
+        <a href="{% url 'stock_detail' item.symbol_yf %}" class="top10-row">
+            <span class="top10-rank {% if forloop.counter <= 3 %}gold{% endif %}">{{ forloop.counter }}</span>
+            <div class="top10-info">
+                <span class="top10-symbol">{{ item.symbol }}</span>
+                <span class="top10-name">{{ item.name }}</span>
+            </div>
+            <div class="top10-right">
+                <span class="top10-price">{% if currency == 'auto' %}{{ item.currency }}{% else %}{{ currency }}{% endif %} {{ item.price }}</span>
+                <span class="top10-change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">
+                    {% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%
+                </span>
+            </div>
+        </a>
+        {% empty %}
+        <p class="top10-empty">Dados indisponíveis neste momento.</p>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+
 <!-- ══ MARKET SECTIONS ══ -->
 
 <div id="section-all" class="section active">
@@ -387,6 +423,14 @@
 
 {% block extra_js %}
 <script>
+/* ── Top 10 tabs ── */
+function showTop10(id, btn) {
+    document.querySelectorAll('.top10-panel').forEach(function(p){ p.classList.remove('active'); });
+    document.querySelectorAll('.top10-tab').forEach(function(b){ b.classList.remove('active'); });
+    document.getElementById('top10-' + id).classList.add('active');
+    btn.classList.add('active');
+}
+
 /* ── Filter tabs ── */
 function showSection(id, btn) {
     document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });

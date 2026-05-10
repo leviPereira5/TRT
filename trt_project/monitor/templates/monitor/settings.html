@@ -40,11 +40,11 @@
         <div class="section-title">Estado do Email</div>
 
         {% if settings.alert_email %}
-        <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;margin-bottom:16px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <div class="msg-success" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:10px;margin-bottom:16px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             <div>
-                <div style="font-size:13px;font-weight:700;color:#166534;">Email configurado</div>
-                <div style="font-size:12px;color:#15803d;">{{ settings.alert_email }}</div>
+                <div style="font-size:13px;font-weight:700;">Email configurado</div>
+                <div style="font-size:12px;opacity:.8;">{{ settings.alert_email }}</div>
             </div>
         </div>
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">
@@ -55,11 +55,11 @@
             Enviar email de teste
         </a>
         {% else %}
-        <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;margin-bottom:16px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div class="msg-warning" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:10px;margin-bottom:16px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             <div>
-                <div style="font-size:13px;font-weight:700;color:#92400e;">Email não configurado</div>
-                <div style="font-size:12px;color:#b45309;">Configura o email acima para receber alertas.</div>
+                <div style="font-size:13px;font-weight:700;">Email não configurado</div>
+                <div style="font-size:12px;opacity:.8;">Configura o email acima para receber alertas.</div>
             </div>
         </div>
         {% endif %}
