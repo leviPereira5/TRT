@@ -370,28 +370,23 @@ def run_monitor(request):
 
 
 @login_required
-def test_email(request):
-    from django.core.mail import send_mail
-    from django.conf import settings as django_settings
+def test_ntfy(request):
+    import requests as _requests
     s = UserSettings.objects.first() or UserSettings.objects.create()
-    if not s.alert_email:
-        messages.error(request, 'Configura primeiro um email de alerta nas Configurações.')
+    if not s.ntfy_topic:
+        messages.error(request, 'Configura primeiro um tópico ntfy.sh nas Configurações.')
         return redirect('settings')
     try:
-        send_mail(
-            subject='✅ Teste — TRT Invest',
-            message=(
-                'Este é um email de teste do TRT Invest.\n\n'
-                'Se recebeste este email, o sistema de alertas está configurado corretamente.\n\n'
-                '— TRT Monitor'
-            ),
-            from_email=django_settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[s.alert_email],
-            fail_silently=False,
+        resp = _requests.post(
+            f"https://ntfy.sh/{s.ntfy_topic}",
+            data='✅ Teste TRT Invest — sistema de alertas a funcionar!'.encode('utf-8'),
+            headers={"Title": "TRT - Teste", "Priority": "default", "Tags": "white_check_mark"},
+            timeout=5,
         )
-        messages.success(request, f'Email de teste enviado com sucesso para {s.alert_email}.')
+        resp.raise_for_status()
+        messages.success(request, f'Notificação enviada para ntfy.sh/{s.ntfy_topic}.')
     except Exception as e:
-        messages.error(request, f'Erro ao enviar email: {e}')
+        messages.error(request, f'Erro ao enviar notificação: {e}')
     return redirect('settings')
 
 

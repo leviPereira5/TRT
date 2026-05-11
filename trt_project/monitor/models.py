@@ -24,7 +24,7 @@ class Stock(models.Model):
 
 class UserSettings(models.Model):
     monitoring_interval = models.PositiveIntegerField(default=60)
-    alert_email         = models.EmailField(blank=True)
+    ntfy_topic          = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return f"Configurações (intervalo: {self.monitoring_interval}s)"

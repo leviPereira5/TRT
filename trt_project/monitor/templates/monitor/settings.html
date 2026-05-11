@@ -17,8 +17,8 @@
             {% for field in form %}
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                 {{ field }}
-                {% if field.name == 'alert_email' %}
-                    <div class="hint">Email que receberá as notificações quando um alerta for gerado.</div>
+                {% if field.name == 'ntfy_topic' %}
+                    <div class="hint">Nome do tópico ntfy.sh (ex: <code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:11px;">trt-alertas-miguelbr</code>). Escolhe um nome único e secreto.</div>
                 {% endif %}
                 {% if field.name == 'monitoring_interval' %}
                     <div class="hint">Intervalo em segundos entre cada ciclo de monitorização (1 – 3600 s).</div>
@@ -35,51 +35,49 @@
         </form>
     </div>
 
-    <!-- ── Estado do Email ── -->
+    <!-- ── Estado das Notificações ntfy ── -->
     <div class="card">
-        <div class="section-title">Estado do Email</div>
+        <div class="section-title">Estado das Notificações</div>
 
-        {% if settings.alert_email %}
+        {% if settings.ntfy_topic %}
         <div class="msg-success" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:10px;margin-bottom:16px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             <div>
-                <div style="font-size:13px;font-weight:700;">Email configurado</div>
-                <div style="font-size:12px;opacity:.8;">{{ settings.alert_email }}</div>
+                <div style="font-size:13px;font-weight:700;">ntfy.sh configurado</div>
+                <div style="font-size:12px;opacity:.8;">ntfy.sh/{{ settings.ntfy_topic }}</div>
             </div>
         </div>
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">
-            Clica em <strong>Enviar email de teste</strong> para confirmar que o sistema de alertas está a funcionar corretamente.
+            Clica em <strong>Enviar notificação de teste</strong> para confirmar que as alertas chegam ao teu telemóvel.
         </p>
-        <a href="{% url 'test_email' %}" class="btn btn-add" style="display:inline-flex;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            Enviar email de teste
+        <a href="{% url 'test_ntfy' %}" class="btn btn-add" style="display:inline-flex;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            Enviar notificação de teste
         </a>
         {% else %}
         <div class="msg-warning" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:10px;margin-bottom:16px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             <div>
-                <div style="font-size:13px;font-weight:700;">Email não configurado</div>
-                <div style="font-size:12px;opacity:.8;">Configura o email acima para receber alertas.</div>
+                <div style="font-size:13px;font-weight:700;">Notificações não configuradas</div>
+                <div style="font-size:12px;opacity:.8;">Define um tópico ntfy.sh acima para receber alertas no telemóvel.</div>
             </div>
         </div>
         {% endif %}
 
-        <!-- Instruções SMTP -->
+        <!-- Instruções ntfy -->
         <details style="margin-top:16px;">
             <summary style="font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;user-select:none;letter-spacing:.3px;text-transform:uppercase;">
-                Como configurar o envio de emails (Gmail)
+                Como configurar notificações push (ntfy.sh) — grátis, sem conta
             </summary>
             <div style="margin-top:12px;font-size:13px;color:var(--muted);line-height:1.7;border-left:3px solid var(--y);padding-left:14px;">
-                <p style="margin-bottom:8px;">O sistema usa SMTP para enviar alertas. Para o Gmail, segue estes passos:</p>
-                <ol style="padding-left:18px;display:flex;flex-direction:column;gap:6px;">
-                    <li>Ativa a <strong>Verificação em 2 passos</strong> na tua conta Google.</li>
-                    <li>Em <strong>Segurança → Passwords de aplicações</strong>, cria uma nova password para "TRT Invest".</li>
-                    <li>No ficheiro <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px;">.env</code> do projeto, preenche:<br>
-                        <code style="display:block;background:var(--bg);padding:8px 12px;border-radius:6px;font-size:12px;margin-top:6px;white-space:pre;">EMAIL_HOST_USER=o-teu@gmail.com
-EMAIL_HOST_PASSWORD=xxxx xxxx xxxx xxxx</code>
-                    </li>
-                    <li>Reinicia o servidor Django depois de guardar o <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px;">.env</code>.</li>
+                <ol style="padding-left:18px;display:flex;flex-direction:column;gap:8px;">
+                    <li>Instala a app <strong>ntfy</strong> no teu telemóvel (Android ou iOS — é gratuita).</li>
+                    <li>Escolhe um nome de tópico único e secreto, ex: <code style="background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px;">trt-alertas-miguelbr</code></li>
+                    <li>Na app ntfy, subscreve esse tópico (botão <strong>+</strong> e escreve o nome).</li>
+                    <li>Cola o mesmo nome no campo <strong>Tópico ntfy.sh</strong> acima e guarda.</li>
+                    <li>Clica em <strong>Enviar notificação de teste</strong> — deves recebê-la imediatamente.</li>
                 </ol>
+                <p style="margin-top:10px;font-size:12px;opacity:.8;">Nenhuma conta, nenhum SMTP, nenhuma password de aplicação. Só HTTP.</p>
             </div>
         </details>
     </div>

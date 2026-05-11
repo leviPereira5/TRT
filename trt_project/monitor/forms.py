@@ -25,10 +25,10 @@ class StockForm(forms.ModelForm):
 class SettingsForm(forms.ModelForm):
     class Meta:
         model  = UserSettings
-        fields = ['monitoring_interval', 'alert_email']
+        fields = ['monitoring_interval', 'ntfy_topic']
         labels = {
             'monitoring_interval': 'Intervalo (segundos)',
-            'alert_email':         'Email para alertas',
+            'ntfy_topic':          'Tópico ntfy.sh',
         }
 
     def clean_monitoring_interval(self):

@@ -4,7 +4,6 @@ import logging
 from decimal import Decimal
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from django.utils import timezone
-from django.core.mail import send_mail
 from django.conf import settings as django_settings
 from django.core.cache import cache
 from .models import Stock, StockPrice, Alert, UserSettings
@@ -262,30 +261,33 @@ def already_alerted(stock, direction):
     cutoff = timezone.now() - timedelta(minutes=60)
     return Alert.objects.filter(stock=stock, direction=direction, sent_at__gte=cutoff).exists()
 
-def send_alert_email(alert, settings):
-    if not settings.alert_email:
+def send_ntfy_notification(alert, settings):
+    if not settings.ntfy_topic:
         return
     try:
+        import requests as _requests
         emoji     = '📈' if alert.direction == 'high' else '📉'
         direction = 'Alta' if alert.direction == 'high' else 'Baixa'
-        send_mail(
-            subject=f"{emoji} Alerta TRT — {alert.stock.symbol} {direction} {alert.variation}%",
-            message=(
-                f"Alerta de {direction} para {alert.stock.symbol}!\n\n"
-                f"Variação: {alert.variation:+}%\n"
-                f"Preço atual: {alert.price}\n"
-                f"Data/Hora: {alert.sent_at.strftime('%d/%m/%Y %H:%M:%S')}\n\n"
-                f"— TRT Monitor"
-            ),
-            from_email=django_settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[settings.alert_email],
-            fail_silently=False,
+        tag       = 'chart_with_upwards_trend' if alert.direction == 'high' else 'chart_with_downwards_trend'
+        _requests.post(
+            f"https://ntfy.sh/{settings.ntfy_topic}",
+            data=(
+                f"{emoji} {alert.stock.symbol} {direction} {alert.variation:+}%\n"
+                f"Preço: {alert.price}\n"
+                f"{alert.sent_at.strftime('%d/%m/%Y %H:%M:%S')}"
+            ).encode('utf-8'),
+            headers={
+                "Title":    f"TRT Alerta - {alert.stock.symbol} {direction}",
+                "Priority": "high",
+                "Tags":     tag,
+            },
+            timeout=5,
         )
         alert.email_sent = True
         alert.save()
-        logger.info(f"Email enviado: {alert.stock.symbol} {direction}")
+        logger.info(f"Notificação ntfy enviada: {alert.stock.symbol} {direction}")
     except Exception as e:
-        logger.error(f"Erro ao enviar email: {e}")
+        logger.error(f"Erro ao enviar notificação ntfy: {e}")
 
 def check_and_alert(stock, variation, new_price, settings):
     if variation >= stock.threshold_high:
@@ -300,7 +302,7 @@ def check_and_alert(stock, variation, new_price, settings):
         stock=stock, direction=direction,
         variation=variation, price=new_price, notified=True
     )
-    send_alert_email(alert, settings)
+    send_ntfy_notification(alert, settings)
     return alert
 
 def monitor_stock(stock, settings):
