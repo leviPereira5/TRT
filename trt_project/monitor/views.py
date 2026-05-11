@@ -108,6 +108,8 @@ def home(request):
         ('br',     top_movers.get('br', []),     'R$'),
         ('fii',    top_movers.get('fii', []),    'R$'),
         ('crypto', top_movers.get('crypto', []), 'auto'),
+        ('eu',     top_movers.get('eu', []),     'auto'),
+        ('cn',     top_movers.get('cn', []),     'HKD'),
     ]
     return render(request, 'monitor/home.html', {
         'overview':       overview,
@@ -387,6 +389,37 @@ def test_ntfy(request):
         messages.success(request, f'Notificação enviada para ntfy.sh/{s.ntfy_topic}.')
     except Exception as e:
         messages.error(request, f'Erro ao enviar notificação: {e}')
+    return redirect('settings')
+
+
+@login_required
+def test_email(request):
+    s = UserSettings.objects.first() or UserSettings.objects.create()
+    if not s.email_enabled or not s.email_address:
+        messages.error(request, 'Ativa e configura o email nas Configurações antes de testar.')
+        return redirect('settings')
+    try:
+        from django.core.mail import EmailMessage, get_connection
+        connection = get_connection(
+            backend='django.core.mail.backends.smtp.EmailBackend',
+            host=s.smtp_host,
+            port=s.smtp_port,
+            username=s.smtp_user,
+            password=s.smtp_password,
+            use_tls=True,
+            fail_silently=False,
+        )
+        msg = EmailMessage(
+            'TRT — Teste de alertas por email',
+            '✅ Sistema de alertas por email a funcionar!\n\n—\nTRT Monitor',
+            s.smtp_user,
+            [s.email_address],
+            connection=connection,
+        )
+        msg.send()
+        messages.success(request, f'Email de teste enviado para {s.email_address}.')
+    except Exception as e:
+        messages.error(request, f'Erro ao enviar email: {e}')
     return redirect('settings')
 
 

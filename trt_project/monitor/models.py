@@ -7,6 +7,8 @@ class Stock(models.Model):
         ('stock_br', 'Ação Brasil'),
         ('fii',      'Fundo Imobiliário'),
         ('crypto',   'Criptomoeda'),
+        ('stock_eu', 'Ação Europa'),
+        ('stock_cn', 'Ação China/HK'),
     ]
     symbol         = models.CharField(max_length=15, unique=True)
     name           = models.CharField(max_length=100, blank=True)
@@ -25,6 +27,12 @@ class Stock(models.Model):
 class UserSettings(models.Model):
     monitoring_interval = models.PositiveIntegerField(default=60)
     ntfy_topic          = models.CharField(max_length=200, blank=True)
+    email_enabled       = models.BooleanField(default=False)
+    email_address       = models.EmailField(max_length=254, blank=True)
+    smtp_host           = models.CharField(max_length=200, default='smtp.gmail.com')
+    smtp_port           = models.PositiveIntegerField(default=587)
+    smtp_user           = models.EmailField(max_length=254, blank=True)
+    smtp_password       = models.CharField(max_length=200, blank=True)
 
     def __str__(self):
         return f"Configurações (intervalo: {self.monitoring_interval}s)"

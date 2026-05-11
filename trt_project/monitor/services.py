@@ -28,6 +28,18 @@ TOP_CRYPTO_LIST = [
     'SHIB-USD','TRX-USD',
 ]
 
+TOP_EU_LIST = [
+    'ASML.AS','MC.PA','SAP.DE','NESN.SW','NOVN.SW','TTE.PA','SIE.DE','BMW.DE',
+    'ADS.DE','AIR.PA','BNP.PA','OR.PA','RMS.PA','ITX.MC','IBE.MC',
+    'ENEL.MI','ENI.MI','IFX.DE','DTE.DE','PHIA.AS',
+]
+
+TOP_CN_LIST = [
+    '0700.HK','9988.HK','3690.HK','9618.HK','1211.HK',
+    '0005.HK','2318.HK','0941.HK','2382.HK','1299.HK',
+    '0388.HK','9999.HK','2269.HK','3988.HK','0762.HK',
+]
+
 # ETFs B3 que aproximam os índices do Tesouro Direto
 TESOURO_ETFS = [
     {'nome': 'Tesouro IPCA+',      'etf': 'IMAB11.SA', 'tipo': 'IPCA+',      'desc': 'Protegido contra inflação'},
@@ -35,9 +47,12 @@ TESOURO_ETFS = [
     {'nome': 'Tesouro SELIC',       'etf': 'TESD11.SA', 'tipo': 'SELIC',      'desc': 'Acompanha a taxa SELIC'},
     {'nome': 'Tesouro IGPM+',       'etf': 'XFIX11.SA', 'tipo': 'IGP-M+',     'desc': 'Indexado ao IGP-M'},
 ]
-FEATURED_BR = ['PETR4.SA','VALE3.SA','ITUB4.SA','BBDC4.SA','ABEV3.SA','WEGE3.SA']
-FEATURED_FII = ['HGLG11.SA','XPML11.SA','KNRI11.SA','MXRF11.SA','VISC11.SA']
+FEATURED_BR     = ['PETR4.SA','VALE3.SA','ITUB4.SA','BBDC4.SA','ABEV3.SA','WEGE3.SA']
+FEATURED_FII    = ['HGLG11.SA','XPML11.SA','KNRI11.SA','MXRF11.SA','VISC11.SA']
 FEATURED_CRYPTO = ['BTC-USD','ETH-USD','SOL-USD','BNB-USD','XRP-USD','ADA-USD','AVAX-USD','DOGE-USD']
+FEATURED_EU     = ['ASML.AS','MC.PA','SAP.DE','NESN.SW','TTE.PA','SIE.DE','BMW.DE','AIR.PA']
+FEATURED_CN     = ['0700.HK','9988.HK','3690.HK','9618.HK','1211.HK','0005.HK','2318.HK','0941.HK']
+FEATURED_ETF    = ['SPY','QQQ','VTI','EFA','GLD','TLT','VWO','ARKK']
 
 def _screener_to_item(q):
     price      = q.get('regularMarketPrice', 0)
@@ -113,12 +128,38 @@ def fetch_top_movers():
         items = sorted(indexed.values(), key=lambda x: x.get('change_pct', 0), reverse=True)
         return items[:10]
 
-    with ThreadPoolExecutor(max_workers=4) as ex:
+    def _eu_top():
+        indexed = {}
+        with ThreadPoolExecutor(max_workers=10) as ex:
+            futures = {ex.submit(_fetch_single, s): i for i, s in enumerate(TOP_EU_LIST)}
+            for future in as_completed(futures):
+                r = future.result()
+                if r:
+                    indexed[futures[future]] = r
+        return sorted(indexed.values(), key=lambda x: x.get('change_pct', 0), reverse=True)[:10]
+
+    def _cn_top():
+        indexed = {}
+        with ThreadPoolExecutor(max_workers=10) as ex:
+            futures = {ex.submit(_fetch_single, s): i for i, s in enumerate(TOP_CN_LIST)}
+            for future in as_completed(futures):
+                r = future.result()
+                if r:
+                    indexed[futures[future]] = r
+        return sorted(indexed.values(), key=lambda x: x.get('change_pct', 0), reverse=True)[:10]
+
+    with ThreadPoolExecutor(max_workers=6) as ex:
         fu = ex.submit(_us_top)
         fb = ex.submit(_br_top)
         ff = ex.submit(_fii_top)
         fc = ex.submit(_crypto_top)
-        result = {'us': fu.result(), 'br': fb.result(), 'fii': ff.result(), 'crypto': fc.result()}
+        fe = ex.submit(_eu_top)
+        fn = ex.submit(_cn_top)
+        result = {
+            'us': fu.result(), 'br': fb.result(),
+            'fii': ff.result(), 'crypto': fc.result(),
+            'eu': fe.result(), 'cn': fn.result(),
+        }
 
     cache.set('top_movers', result, 300)
     return result
@@ -233,16 +274,22 @@ def fetch_market_overview():
     cached = cache.get('market_overview')
     if cached:
         return cached
-    with ThreadPoolExecutor(max_workers=4) as ex:
+    with ThreadPoolExecutor(max_workers=7) as ex:
         f_us     = ex.submit(_fetch_group, FEATURED_US)
         f_br     = ex.submit(_fetch_group, FEATURED_BR)
         f_fii    = ex.submit(_fetch_group, FEATURED_FII)
         f_crypto = ex.submit(_fetch_group, FEATURED_CRYPTO)
+        f_eu     = ex.submit(_fetch_group, FEATURED_EU)
+        f_cn     = ex.submit(_fetch_group, FEATURED_CN)
+        f_etf    = ex.submit(_fetch_group, FEATURED_ETF)
         result = {
             'us':     f_us.result(),
             'br':     f_br.result(),
             'fii':    f_fii.result(),
             'crypto': f_crypto.result(),
+            'eu':     f_eu.result(),
+            'cn':     f_cn.result(),
+            'etf':    f_etf.result(),
         }
     cache.set('market_overview', result, 300)
     return result
@@ -289,6 +336,36 @@ def send_ntfy_notification(alert, settings):
     except Exception as e:
         logger.error(f"Erro ao enviar notificação ntfy: {e}")
 
+def send_email_notification(alert, settings):
+    if not settings.email_enabled or not settings.email_address or not settings.smtp_user or not settings.smtp_password:
+        return
+    try:
+        from django.core.mail import EmailMessage, get_connection
+        direction = 'Alta' if alert.direction == 'high' else 'Baixa'
+        emoji     = '📈' if alert.direction == 'high' else '📉'
+        subject   = f"TRT Alerta — {alert.stock.symbol} {direction} {alert.variation:+.2f}%"
+        body      = (
+            f"{emoji} {alert.stock.name or alert.stock.symbol} — {direction}\n\n"
+            f"Variação: {alert.variation:+.2f}%\n"
+            f"Preço atual: {alert.price}\n"
+            f"Data/Hora: {alert.sent_at.strftime('%d/%m/%Y %H:%M')}\n\n"
+            f"—\nTRT Monitor"
+        )
+        connection = get_connection(
+            backend='django.core.mail.backends.smtp.EmailBackend',
+            host=settings.smtp_host,
+            port=settings.smtp_port,
+            username=settings.smtp_user,
+            password=settings.smtp_password,
+            use_tls=True,
+            fail_silently=False,
+        )
+        msg = EmailMessage(subject, body, settings.smtp_user, [settings.email_address], connection=connection)
+        msg.send()
+        logger.info(f"Email de alerta enviado: {alert.stock.symbol} {direction} → {settings.email_address}")
+    except Exception as e:
+        logger.error(f"Erro ao enviar email de alerta: {e}")
+
 def check_and_alert(stock, variation, new_price, settings):
     if variation >= stock.threshold_high:
         direction = 'high'
@@ -303,6 +380,7 @@ def check_and_alert(stock, variation, new_price, settings):
         variation=variation, price=new_price, notified=True
     )
     send_ntfy_notification(alert, settings)
+    send_email_notification(alert, settings)
     return alert
 
 def monitor_stock(stock, settings):

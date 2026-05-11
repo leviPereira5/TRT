@@ -10,15 +10,18 @@
     <button class="filter-btn active" onclick="showSection('all',this)">Todos</button>
     <button class="filter-btn" onclick="showSection('us',this)">🇺🇸 Ações EUA</button>
     <button class="filter-btn" onclick="showSection('br',this)">🇧🇷 Ações Brasil</button>
-    <button class="filter-btn" onclick="showSection('fii',this)">🏢 Fundos Imobiliários</button>
-    <button class="filter-btn" onclick="showSection('crypto',this)">₿ Criptomoedas</button>
+    <button class="filter-btn" onclick="showSection('fii',this)">🏢 Fundos Imob.</button>
+    <button class="filter-btn" onclick="showSection('crypto',this)">₿ Cripto</button>
+    <button class="filter-btn" onclick="showSection('eu',this)">🇪🇺 Europa</button>
+    <button class="filter-btn" onclick="showSection('cn',this)">🇨🇳 China/HK</button>
+    <button class="filter-btn" onclick="showSection('etf',this)">📊 ETFs</button>
 </div>
 {% endblock %}
 
 {% block content %}
 
 {# ── Compute summary data via template ── #}
-{% with us_count=overview.us|length br_count=overview.br|length fii_count=overview.fii|length crypto_count=overview.crypto|length %}
+{% with us_count=overview.us|length br_count=overview.br|length fii_count=overview.fii|length crypto_count=overview.crypto|length eu_count=overview.eu|length cn_count=overview.cn|length etf_count=overview.etf|length %}
 
 <!-- ══ SUMMARY STATS ══ -->
 <div class="mkt-summary">
@@ -71,6 +74,42 @@
         </div>
     </div>
 
+    <div class="mkt-stat" style="--stat-color:#0369a1">
+        <span class="mkt-stat-label">Europa</span>
+        <span class="mkt-stat-value">{{ eu_count }}</span>
+        <span class="mkt-stat-sub" style="color:#0369a1">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            ativos monitorados
+        </span>
+        <div class="mkt-stat-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#0369a1" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+        </div>
+    </div>
+
+    <div class="mkt-stat" style="--stat-color:#b91c1c">
+        <span class="mkt-stat-label">China/HK</span>
+        <span class="mkt-stat-value">{{ cn_count }}</span>
+        <span class="mkt-stat-sub" style="color:#b91c1c">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+            ativos monitorados
+        </span>
+        <div class="mkt-stat-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="1.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        </div>
+    </div>
+
+    <div class="mkt-stat" style="--stat-color:#0891b2">
+        <span class="mkt-stat-label">ETFs</span>
+        <span class="mkt-stat-value">{{ etf_count }}</span>
+        <span class="mkt-stat-sub" style="color:#0891b2">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            ativos monitorados
+        </span>
+        <div class="mkt-stat-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#0891b2" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        </div>
+    </div>
+
 </div>
 
 <!-- ══ CHARTS ROW ══ -->
@@ -82,26 +121,13 @@
         <div class="donut-wrap">
             <canvas id="donutChart"></canvas>
             <div class="donut-legend">
-                <div class="legend-item">
-                    <span class="legend-dot" style="background:#3b82f6"></span>
-                    <span>Ações EUA</span>
-                    <span class="legend-count">{{ us_count }}</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-dot" style="background:#16a34a"></span>
-                    <span>Ações BR</span>
-                    <span class="legend-count">{{ br_count }}</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-dot" style="background:#f59e0b"></span>
-                    <span>FIIs</span>
-                    <span class="legend-count">{{ fii_count }}</span>
-                </div>
-                <div class="legend-item">
-                    <span class="legend-dot" style="background:#8b5cf6"></span>
-                    <span>Cripto</span>
-                    <span class="legend-count">{{ crypto_count }}</span>
-                </div>
+                <div class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span><span>EUA</span><span class="legend-count">{{ us_count }}</span></div>
+                <div class="legend-item"><span class="legend-dot" style="background:#16a34a"></span><span>Brasil</span><span class="legend-count">{{ br_count }}</span></div>
+                <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span><span>FIIs</span><span class="legend-count">{{ fii_count }}</span></div>
+                <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span><span>Cripto</span><span class="legend-count">{{ crypto_count }}</span></div>
+                <div class="legend-item"><span class="legend-dot" style="background:#0369a1"></span><span>Europa</span><span class="legend-count">{{ eu_count }}</span></div>
+                <div class="legend-item"><span class="legend-dot" style="background:#b91c1c"></span><span>China/HK</span><span class="legend-count">{{ cn_count }}</span></div>
+                <div class="legend-item"><span class="legend-dot" style="background:#0891b2"></span><span>ETFs</span><span class="legend-count">{{ etf_count }}</span></div>
             </div>
         </div>
     </div>
@@ -117,6 +143,8 @@
 </div>
 
 {% endwith %}
+
+<div id="section-all" class="section active">
 
 <!-- ══ TAXAS DE REFERÊNCIA (BCB) ══ -->
 {% if taxas %}
@@ -216,6 +244,8 @@
         <button class="top10-tab" onclick="showTop10('br',this)">🇧🇷 Brasil</button>
         <button class="top10-tab" onclick="showTop10('fii',this)">🏢 FIIs</button>
         <button class="top10-tab" onclick="showTop10('crypto',this)">₿ Crypto</button>
+        <button class="top10-tab" onclick="showTop10('eu',this)">🇪🇺 Europa</button>
+        <button class="top10-tab" onclick="showTop10('cn',this)">🇨🇳 China/HK</button>
     </div>
 
     {% for key, items, currency in top10_sections %}
@@ -242,8 +272,6 @@
 </div>
 
 <!-- ══ MARKET SECTIONS ══ -->
-
-<div id="section-all" class="section active">
 
     {% if overview.us %}
     <div class="category-block">
@@ -390,6 +418,117 @@
     </div>
     {% endif %}
 
+    {% if overview.eu %}
+    <div class="category-block">
+        <div class="mkt-header">
+            <div class="section-title">🇪🇺 Ações Europa</div>
+            <div class="view-toggle">
+                <button class="view-btn active" onclick="setView('all_eu','cards',this)">⊞</button>
+                <button class="view-btn" onclick="setView('all_eu','table',this)">☰</button>
+            </div>
+        </div>
+        <div id="all_eu-cards" class="cards">
+            {% for item in overview.eu %}
+            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
+                <div class="mc-header">
+                    <div class="mc-logo">
+                        {% if item.logo_url %}<img src="{{ item.logo_url }}" alt="{{ item.symbol }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="mc-logo-fallback" style="display:none">{{ item.symbol|first }}</span>{% else %}<span class="mc-logo-fallback">{{ item.symbol|first }}</span>{% endif %}
+                    </div>
+                    <div class="mc-meta"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div></div>
+                </div>
+                <div class="price">{{ item.currency }} {{ item.price }}</div>
+                <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
+            </a>
+            {% endfor %}
+        </div>
+        <table id="all_eu-table" style="display:none">
+            <tr><th>Símbolo</th><th>Nome</th><th>Preço</th><th>Variação</th></tr>
+            {% for item in overview.eu %}
+            <tr>
+                <td><a href="{% url 'stock_detail' item.symbol_yf %}">{{ item.symbol }}</a></td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.currency }} {{ item.price }}</td>
+                <td class="{% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{{ item.change_pct }}%</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+
+    {% if overview.cn %}
+    <div class="category-block">
+        <div class="mkt-header">
+            <div class="section-title">🇨🇳 Ações China/HK</div>
+            <div class="view-toggle">
+                <button class="view-btn active" onclick="setView('all_cn','cards',this)">⊞</button>
+                <button class="view-btn" onclick="setView('all_cn','table',this)">☰</button>
+            </div>
+        </div>
+        <div id="all_cn-cards" class="cards">
+            {% for item in overview.cn %}
+            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
+                <div class="mc-header">
+                    <div class="mc-logo">
+                        {% if item.logo_url %}<img src="{{ item.logo_url }}" alt="{{ item.symbol }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="mc-logo-fallback" style="display:none">{{ item.symbol|first }}</span>{% else %}<span class="mc-logo-fallback">{{ item.symbol|first }}</span>{% endif %}
+                    </div>
+                    <div class="mc-meta"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div></div>
+                </div>
+                <div class="price">{{ item.currency }} {{ item.price }}</div>
+                <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
+            </a>
+            {% endfor %}
+        </div>
+        <table id="all_cn-table" style="display:none">
+            <tr><th>Símbolo</th><th>Nome</th><th>Preço</th><th>Variação</th></tr>
+            {% for item in overview.cn %}
+            <tr>
+                <td><a href="{% url 'stock_detail' item.symbol_yf %}">{{ item.symbol }}</a></td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.currency }} {{ item.price }}</td>
+                <td class="{% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{{ item.change_pct }}%</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+
+    {% if overview.etf %}
+    <div class="category-block">
+        <div class="mkt-header">
+            <div class="section-title">📊 ETFs Globais</div>
+            <div class="view-toggle">
+                <button class="view-btn active" onclick="setView('all_etf','cards',this)">⊞</button>
+                <button class="view-btn" onclick="setView('all_etf','table',this)">☰</button>
+            </div>
+        </div>
+        <div id="all_etf-cards" class="cards">
+            {% for item in overview.etf %}
+            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
+                <div class="mc-header">
+                    <div class="mc-logo">
+                        {% if item.logo_url %}<img src="{{ item.logo_url }}" alt="{{ item.symbol }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="mc-logo-fallback" style="display:none">{{ item.symbol|first }}</span>{% else %}<span class="mc-logo-fallback">{{ item.symbol|first }}</span>{% endif %}
+                    </div>
+                    <div class="mc-meta"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div></div>
+                </div>
+                <div class="price">{{ item.currency }} {{ item.price }}</div>
+                <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
+            </a>
+            {% endfor %}
+        </div>
+        <table id="all_etf-table" style="display:none">
+            <tr><th>Símbolo</th><th>Nome</th><th>Preço</th><th>Variação</th></tr>
+            {% for item in overview.etf %}
+            <tr>
+                <td><a href="{% url 'stock_detail' item.symbol_yf %}">{{ item.symbol }}</a></td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.currency }} {{ item.price }}</td>
+                <td class="{% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{{ item.change_pct }}%</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endif %}
+
 </div>
 
 <!-- Individual sections (filter bar) -->
@@ -417,6 +556,24 @@
     <div class="section-title">₿ Criptomoedas</div>
     <div class="view-toggle"><button class="view-btn active" onclick="setView('crypto','cards',this)">⊞</button><button class="view-btn" onclick="setView('crypto','table',this)">☰</button></div>
     <div id="crypto-cards" class="cards">{% for item in overview.crypto %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">$ {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div></a>{% endfor %}</div>
+</div>
+
+<div id="section-eu" class="section">
+    <div class="section-title">🇪🇺 Ações Europa</div>
+    <div class="view-toggle"><button class="view-btn active" onclick="setView('eu','cards',this)">⊞</button><button class="view-btn" onclick="setView('eu','table',this)">☰</button></div>
+    <div id="eu-cards" class="cards">{% for item in overview.eu %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">{{ item.currency }} {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div></a>{% endfor %}</div>
+</div>
+
+<div id="section-cn" class="section">
+    <div class="section-title">🇨🇳 Ações China/HK</div>
+    <div class="view-toggle"><button class="view-btn active" onclick="setView('cn','cards',this)">⊞</button><button class="view-btn" onclick="setView('cn','table',this)">☰</button></div>
+    <div id="cn-cards" class="cards">{% for item in overview.cn %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">{{ item.currency }} {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div></a>{% endfor %}</div>
+</div>
+
+<div id="section-etf" class="section">
+    <div class="section-title">📊 ETFs Globais</div>
+    <div class="view-toggle"><button class="view-btn active" onclick="setView('etf','cards',this)">⊞</button><button class="view-btn" onclick="setView('etf','table',this)">☰</button></div>
+    <div id="etf-cards" class="cards">{% for item in overview.etf %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">{{ item.currency }} {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div></a>{% endfor %}</div>
 </div>
 
 {% endblock %}
@@ -455,6 +612,9 @@ var usData   = {{ overview.us|length }};
 var brData   = {{ overview.br|length }};
 var fiiData  = {{ overview.fii|length }};
 var cryData  = {{ overview.crypto|length }};
+var euData   = {{ overview.eu|length }};
+var cnData   = {{ overview.cn|length }};
+var etfData  = {{ overview.etf|length }};
 
 /* Avg change per category */
 function avgChange(items) {
@@ -467,20 +627,26 @@ var usChanges   = [{% for i in overview.us %}{{ i.change_pct }},{% endfor %}];
 var brChanges   = [{% for i in overview.br %}{{ i.change_pct }},{% endfor %}];
 var fiiChanges  = [{% for i in overview.fii %}{{ i.change_pct }},{% endfor %}];
 var cryChanges  = [{% for i in overview.crypto %}{{ i.change_pct }},{% endfor %}];
+var euChanges   = [{% for i in overview.eu %}{{ i.change_pct }},{% endfor %}];
+var cnChanges   = [{% for i in overview.cn %}{{ i.change_pct }},{% endfor %}];
+var etfChanges  = [{% for i in overview.etf %}{{ i.change_pct }},{% endfor %}];
 
 var avgUS  = avgChange(usChanges);
 var avgBR  = avgChange(brChanges);
 var avgFII = avgChange(fiiChanges);
 var avgCRY = avgChange(cryChanges);
+var avgEU  = avgChange(euChanges);
+var avgCN  = avgChange(cnChanges);
+var avgETF = avgChange(etfChanges);
 
 /* ── Donut chart ── */
 new Chart(document.getElementById('donutChart'), {
     type: 'doughnut',
     data: {
-        labels: ['Ações EUA', 'Ações BR', 'FIIs', 'Cripto'],
+        labels: ['Ações EUA', 'Ações BR', 'FIIs', 'Cripto', 'Europa', 'China/HK', 'ETFs'],
         datasets: [{
-            data: [usData, brData, fiiData, cryData],
-            backgroundColor: ['#3b82f6','#16a34a','#f59e0b','#8b5cf6'],
+            data: [usData, brData, fiiData, cryData, euData, cnData, etfData],
+            backgroundColor: ['#3b82f6','#16a34a','#f59e0b','#8b5cf6','#0369a1','#b91c1c','#0891b2'],
             borderWidth: 0,
             hoverOffset: 6,
         }]
@@ -496,10 +662,13 @@ new Chart(document.getElementById('donutChart'), {
 
 /* ── Bar chart (avg change) ── */
 var cats = [
-    { name: '🇺🇸 EUA',   avg: avgUS,  color: '#3b82f6' },
-    { name: '🇧🇷 Brasil', avg: avgBR,  color: '#16a34a' },
-    { name: '🏢 FIIs',   avg: avgFII, color: '#f59e0b' },
-    { name: '₿ Cripto',  avg: avgCRY, color: '#8b5cf6' },
+    { name: '🇺🇸 EUA',     avg: avgUS,  color: '#3b82f6' },
+    { name: '🇧🇷 Brasil',  avg: avgBR,  color: '#16a34a' },
+    { name: '🏢 FIIs',    avg: avgFII, color: '#f59e0b' },
+    { name: '₿ Cripto',   avg: avgCRY, color: '#8b5cf6' },
+    { name: '🇪🇺 Europa',  avg: avgEU,  color: '#0369a1' },
+    { name: '🇨🇳 China',   avg: avgCN,  color: '#b91c1c' },
+    { name: '📊 ETFs',    avg: avgETF, color: '#0891b2' },
 ];
 
 var maxAbs = Math.max.apply(null, cats.map(function(c){ return Math.abs(c.avg); })) || 1;

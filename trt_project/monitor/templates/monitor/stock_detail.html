@@ -61,6 +61,107 @@
 .ind-value.up   { color: var(--green); }
 .ind-value.down { color: var(--red); }
 
+/* ── Info tooltip system ── */
+.tt-btn {
+    flex-shrink: 0;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    background: transparent;
+    color: var(--muted-2);
+    font-size: 8.5px;
+    font-style: italic;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s, color .15s, transform .15s, border-color .15s;
+    padding: 0; line-height: 1;
+    opacity: .6;
+}
+.tt-btn:hover, .tt-btn.tt-active {
+    background: var(--y);
+    border-color: var(--y);
+    color: #000;
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+#trt-tt {
+    position: fixed;
+    z-index: 99999;
+    width: 262px;
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
+    background: rgba(9,11,17,.97);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 13px;
+    padding: 15px 17px 13px;
+    box-shadow: 0 12px 48px rgba(0,0,0,.6), 0 0 0 0.5px rgba(255,255,255,.04);
+    color: rgba(255,255,255,.85);
+    font-size: 12px;
+    line-height: 1.52;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(5px) scale(.975);
+    transition: opacity .17s ease, transform .17s ease;
+    --aw: 50%;
+}
+#trt-tt.tt-on {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
+#trt-tt::after {
+    content: '';
+    position: absolute;
+    left: var(--aw);
+    width: 8px; height: 8px;
+    background: rgba(9,11,17,.97);
+    border: 1px solid rgba(255,255,255,.1);
+    transform: rotate(45deg) translateX(-50%);
+}
+#trt-tt.tt-below::after { top: -5px; border-bottom: none; border-right: none; }
+#trt-tt.tt-above::after { bottom: -5px; border-top: none; border-left: none; }
+
+.tt-title {
+    font-size: 12.5px; font-weight: 800;
+    color: var(--y, #FFD600);
+    margin-bottom: 7px; letter-spacing: -.2px;
+}
+.tt-desc  { color: rgba(255,255,255,.75); margin-bottom: 9px; font-size: 11.5px; line-height: 1.55; }
+.tt-section { margin-bottom: 8px; }
+.tt-slbl {
+    font-size: 9px; font-weight: 800;
+    color: rgba(255,214,0,.6);
+    text-transform: uppercase; letter-spacing: .6px;
+    margin-bottom: 4px;
+}
+.tt-formula {
+    font-family: 'SF Mono','Fira Code','Consolas',monospace;
+    font-size: 10.5px; color: #93c5fd;
+    background: rgba(255,255,255,.06);
+    padding: 4px 8px; border-radius: 5px;
+    display: block; line-height: 1.45;
+}
+.tt-items { display: flex; flex-direction: column; gap: 5px; }
+.tt-item  { display: flex; align-items: flex-start; gap: 8px; font-size: 11.5px; }
+.tt-il    { font-weight: 700; white-space: nowrap; flex-shrink: 0; padding-top: 1px; }
+.tt-it    { color: rgba(255,255,255,.6); flex: 1; min-width: 0; line-height: 1.45; }
+.tt-item.g .tt-il { color: #4ade80; }
+.tt-item.n .tt-il { color: #fbbf24; }
+.tt-item.b .tt-il { color: #f87171; }
+.tt-note {
+    font-size: 10.5px; color: rgba(255,255,255,.38);
+    border-top: 1px solid rgba(255,255,255,.07);
+    padding-top: 8px; margin-top: 6px;
+    font-style: italic; line-height: 1.5;
+}
+
 /* ── Company card ── */
 .company-card {
     background: var(--white);
@@ -560,5 +661,212 @@ function showTab(id, btn) {
     document.getElementById('tab-' + id).classList.add('active');
     btn.classList.add('active');
 }
+</script>
+
+<!-- ══ TOOLTIP ENGINE ══ -->
+<script>
+(function () {
+'use strict';
+
+/* ── Dictionary ─────────────────────────────────────── */
+var D = {
+  pe_ratio:    { t:'P/L — Price/Earnings', d:'Quantas vezes o mercado paga pelos lucros anuais da empresa. O múltiplo de avaliação mais usado globalmente.', f:'Preço da ação ÷ Lucro por ação (LPA)', i:[{c:'g',l:'< 10',x:'Potencialmente barato (ou empresa em dificuldades)'},{c:'n',l:'10–20',x:'Intervalo histórico considerado normal'},{c:'b',l:'> 25',x:'Caro ou expectativa de forte crescimento futuro'}], n:'Comparar sempre com empresas do mesmo setor. P/L negativo indica prejuízo.' },
+  forward_pe:  { t:'P/L Forward', d:'Versão do P/L que usa o lucro estimado para os próximos 12 meses — mais prospetivo que o P/L histórico.', f:'Preço da ação ÷ LPA estimado (próximo ano)', i:[{c:'g',l:'Forward < P/L',x:'Mercado espera crescimento de lucros'},{c:'n',l:'Forward = P/L',x:'Lucros estimados estáveis'},{c:'b',l:'Forward > P/L',x:'Estimativas apontam queda dos lucros'}], n:'Baseia-se em previsões de analistas — podem estar erradas.' },
+  peg_ratio:   { t:'PEG Ratio', d:'Ajusta o P/L pela taxa de crescimento esperado dos lucros. Torna a comparação mais justa entre empresas com ritmos de crescimento diferentes.', f:'P/L ÷ Taxa de crescimento anual dos lucros (%)', i:[{c:'g',l:'< 1',x:'Potencialmente subavaliado face ao crescimento'},{c:'n',l:'≈ 1',x:'Preço equilibrado face ao crescimento esperado'},{c:'b',l:'> 1',x:'Potencialmente caro face ao crescimento esperado'}], n:'Popularizado por Peter Lynch. Mais útil em empresas de crescimento estável.' },
+  div_yield:   { t:'Dividend Yield (D.Y.)', d:'Percentagem anual paga em dividendos relativamente ao preço atual. Mede o rendimento imediato do investimento.', f:'Dividendo por ação (anual) ÷ Preço da ação × 100', i:[{c:'n',l:'< 2%',x:'Baixo — empresa reinveste a maior parte dos lucros'},{c:'g',l:'2%–6%',x:'Razoável — equilíbrio entre dividendos e crescimento'},{c:'b',l:'> 8%',x:'Muito alto — avaliar sustentabilidade do dividendo'}], n:'Yield muito alto pode indicar queda do preço ou dividendo insustentável.' },
+  pb_ratio:    { t:'P/VP — Price to Book', d:'Compara o preço de mercado com o valor patrimonial por ação. Mede o prémio que o mercado paga acima dos ativos líquidos.', f:'Preço da ação ÷ Valor Patrimonial por ação (VPA)', i:[{c:'g',l:'< 1',x:'Abaixo do valor contabilístico — pode ser oportunidade'},{c:'n',l:'1–3',x:'Intervalo normal para a maioria dos setores'},{c:'b',l:'> 5',x:'Prémio elevado — exige justificação (marca, intangíveis)'}], n:'Mais relevante em bancos, seguradoras e empresas capital-intensivas.' },
+  ps_ratio:    { t:'P/SR — Price to Sales', d:'Compara a capitalização de mercado com a receita anual. Útil para empresas que ainda não são lucrativas.', f:'Market Cap ÷ Receita total anual', i:[{c:'g',l:'< 1',x:'Muito baixo para a maioria dos setores'},{c:'n',l:'1–4',x:'Intervalo considerado razoável'},{c:'b',l:'> 8',x:'Alto — comum em empresas de alto crescimento (SaaS, tech)'}], n:'P/S alto exige margens altas para se justificar no longo prazo.' },
+  ev_ebitda:   { t:'EV/EBITDA', d:'Compara o valor total da empresa (incluindo dívida) com o resultado operacional antes de encargos financeiros e não-monetários.', f:'Valor de Firma (EV) ÷ EBITDA', i:[{c:'g',l:'< 8',x:'Potencialmente barato (varia muito por setor)'},{c:'n',l:'8–15',x:'Avaliação razoável para empresas maduras'},{c:'b',l:'> 20',x:'Caro ou com grande expectativa de crescimento'}], n:'Preferido a P/L em aquisições por ser neutro à estrutura de capital.' },
+  ev_revenue:  { t:'EV/Revenue', d:'Compara o valor total da empresa com a receita. Útil quando o EBITDA é negativo ou muito baixo.', f:'Valor de Firma (EV) ÷ Receita total', i:[{c:'g',l:'< 2',x:'Baixo — tipicamente empresas maduras de baixa margem'},{c:'n',l:'2–6',x:'Razoável para empresas com boas margens'},{c:'b',l:'> 10',x:'Alto — justificado apenas por crescimento acelerado'}], n:'Comparar sempre com empresas do mesmo setor.' },
+  eps:         { t:'LPA — Lucro por Ação (EPS)', d:'Parcela do lucro líquido que corresponde a cada ação em circulação. Base para calcular o P/L e outros múltiplos.', f:'Lucro líquido ÷ Número de ações em circulação', i:[{c:'g',l:'Positivo e crescente',x:'Empresa lucrativa com lucros a crescer'},{c:'n',l:'Positivo e estável',x:'Empresa lucrativa mas sem crescimento'},{c:'b',l:'Negativo',x:'Empresa em prejuízo — avaliar a causa'}], n:'LPA diluído inclui opções e convertíveis — é a métrica mais conservadora.' },
+  book_value:  { t:'VPA — Valor Patrimonial por Ação', d:'Valor contabilístico dos ativos líquidos da empresa dividido pelo número de ações. "Valor de liquidação" teórico por ação.', f:'(Ativos totais − Passivos totais) ÷ Nº ações', i:[{c:'g',l:'VPA crescente',x:'Empresa acumula valor ao longo do tempo'},{c:'n',l:'VPA estável',x:'Reinvestimento igual ao lucro distribuído'},{c:'b',l:'VPA decrescente',x:'Recompras excessivas ou prejuízos acumulados'}], n:'Em tecnologia, ativos intangíveis reduzem artificialmente o VPA.' },
+  gross_margin:{ t:'Margem Bruta', d:'Percentagem da receita que sobra após os custos diretos de produção. Mede a eficiência produtiva e o poder de precificação.', f:'(Receita − Custo dos produtos) ÷ Receita × 100', i:[{c:'g',l:'> 40%',x:'Excelente — forte poder de precificação'},{c:'n',l:'20%–40%',x:'Bom — varia muito por setor'},{c:'b',l:'< 15%',x:'Baixo — setor muito competitivo ou de baixa margem'}], n:'Software e farmácia têm margens brutas > 70%. Retalho fica tipicamente < 30%.' },
+  ebitda_margin:{ t:'Margem EBITDA', d:'Rentabilidade operacional antes de juros, impostos, depreciação e amortização. Proxy do fluxo de caixa operacional bruto.', f:'EBITDA ÷ Receita × 100', i:[{c:'g',l:'> 30%',x:'Excelente — negócio muito eficiente operacionalmente'},{c:'n',l:'15%–30%',x:'Bom desempenho operacional'},{c:'b',l:'< 10%',x:'Baixo — alta pressão de custos operacionais'}], n:'Ignora depreciações — em empresas capital-intensivas pode ser enganador.' },
+  op_margin:   { t:'Margem EBIT (Operacional)', d:'Lucro operacional como percentagem da receita. Inclui depreciações ao contrário do EBITDA.', f:'EBIT ÷ Receita × 100', i:[{c:'g',l:'> 20%',x:'Excelente gestão operacional'},{c:'n',l:'10%–20%',x:'Nível saudável para a maioria dos setores'},{c:'b',l:'< 5%',x:'Fraco — custos operacionais muito elevados'}], n:'Diferença entre EBITDA e EBIT revela o peso das depreciações no negócio.' },
+  net_margin:  { t:'Margem Líquida', d:'Percentagem da receita que se converte em lucro líquido, após todos os custos, impostos e encargos financeiros.', f:'Lucro líquido ÷ Receita × 100', i:[{c:'g',l:'> 15%',x:'Excelente — negócio altamente lucrativo'},{c:'n',l:'5%–15%',x:'Nível saudável para a maioria dos setores'},{c:'b',l:'< 3%',x:'Fraco — pouco espaço para absorver dificuldades'}], n:'A margem líquida reflete juros da dívida e impostos — mais completa que EBITDA.' },
+  revenue:     { t:'Receita Total (Revenue)', d:'Volume total de vendas de produtos e serviços no período, antes de qualquer dedução. O topo da demonstração de resultados.', f:'Soma de todas as vendas e prestações de serviços', i:[{c:'g',l:'> 10% a.a.',x:'Crescimento forte — empresa em expansão'},{c:'n',l:'5%–10% a.a.',x:'Crescimento moderado e sustentável'},{c:'b',l:'Negativo',x:'Contração — investigar causas (setor, competição)'}], n:'Receita crescente com margens estáveis ou crescentes é o cenário ideal.' },
+  ebitda:      { t:'EBITDA', d:'Lucro antes de Juros, Impostos, Depreciação e Amortização. Mede a geração de caixa do negócio principal, excluindo efeitos financeiros e contabilísticos.', f:'Lucro líquido + Juros + Impostos + Depreciação + Amortização', i:[{c:'g',l:'Dívida/EBITDA < 2×',x:'Capacidade confortável de servir a dívida'},{c:'n',l:'Dívida/EBITDA 2–4×',x:'Alavancagem moderada mas gerível'},{c:'b',l:'Dívida/EBITDA > 5×',x:'Dívida excessiva face à geração de caixa'}], n:'Amplamente usado em M&A. Não substitui o FCF em análises de caixa.' },
+  free_cash:   { t:'Free Cash Flow (FCF)', d:'Caixa gerado após despesas de capital (CAPEX). É o dinheiro "livre" para dividendos, recompras, redução de dívida ou aquisições.', f:'Fluxo de caixa operacional − CAPEX', i:[{c:'g',l:'Positivo e crescente',x:'Negócio saudável e autofinanciável'},{c:'n',l:'Positivo e estável',x:'Negócio maduro com FCF consistente'},{c:'b',l:'Negativo',x:'Empresa consome mais caixa do que gera — atenção'}], n:'Warren Buffett usa FCF como principal métrica. FCF negativo exige financiamento externo.' },
+  roe:         { t:'ROE — Return on Equity', d:'Retorno gerado para os acionistas por cada unidade de capital próprio investido. Mede a eficiência no uso dos recursos dos acionistas.', f:'Lucro líquido ÷ Patrimônio líquido × 100', i:[{c:'b',l:'< 10%',x:'Fraco — abaixo do custo médio de capital'},{c:'n',l:'10%–15%',x:'Adequado — acima do custo médio de capital'},{c:'g',l:'> 20%',x:'Excelente — Apple, Visa mantêm ROE > 40%'}], n:'ROE elevado com muita dívida pode ser artificial. Usar com Dívida/PL.' },
+  roa:         { t:'ROA — Return on Assets', d:'Eficiência na utilização de todos os ativos (próprios e alheios) para gerar lucro. Não é afetado pela estrutura de capital.', f:'Lucro líquido ÷ Ativos totais × 100', i:[{c:'b',l:'< 3%',x:'Fraco — setor capital-intensivo ou má gestão'},{c:'n',l:'3%–7%',x:'Adequado para a maioria dos setores'},{c:'g',l:'> 10%',x:'Excelente — empresa muito eficiente nos ativos'}], n:'Mais útil que ROE para comparar empresas com estruturas de capital diferentes.' },
+  debt_equity: { t:'Dívida/PL — Debt to Equity', d:'Compara a dívida total com o capital próprio. Mede o grau de alavancagem financeira e o risco para os acionistas.', f:'Dívida total ÷ Patrimônio líquido', i:[{c:'g',l:'< 0.5',x:'Conservador — empresa pouco alavancada'},{c:'n',l:'0.5–1.5',x:'Moderado — alavancagem gerível'},{c:'b',l:'> 2.5',x:'Alto risco financeiro em cenários de stress'}], n:'Utilities e imobiliário operam com Dívida/PL elevado por natureza do negócio.' },
+  current_ratio:{ t:'Liquidez Corrente', d:'Capacidade de pagar obrigações de curto prazo com os ativos circulantes disponíveis. Mede a solvência imediata.', f:'Ativos circulantes ÷ Passivos circulantes', i:[{c:'b',l:'< 1',x:'Preocupante — passivos superam ativos de curto prazo'},{c:'n',l:'1–2',x:'Adequado para a maioria dos setores'},{c:'g',l:'> 2',x:'Confortável — empresa bem capitalizada no curto prazo'}], n:'Acima de 3 pode indicar ativos parados sem uso produtivo.' },
+  total_debt:  { t:'Dívida Bruta', d:'Soma total de todas as dívidas financeiras da empresa, incluindo dívida de curto e longo prazo.', f:'Empréstimos + Obrigações + Dívida bancária', i:[{c:'g',l:'Dívida/EBITDA < 2×',x:'Dívida confortável face à geração de caixa'},{c:'n',l:'Dívida/EBITDA 2–4×',x:'Alavancagem moderada mas gerível'},{c:'b',l:'Dívida/EBITDA > 5×',x:'Dívida elevada — risco em cenários de crise'}], n:'Avaliar sempre com o perfil de vencimentos e a geração de FCF.' },
+  cash:        { t:'Caixa e Equivalentes', d:'Recursos líquidos disponíveis imediatamente. Inclui dinheiro, depósitos bancários e investimentos de muito curto prazo.', f:'Dinheiro + Títulos de curto prazo + Equivalentes', i:[{c:'g',l:'Caixa > Dívida',x:'"Caixa líquido" — fortíssima posição financeira'},{c:'n',l:'Caixa significativo',x:'Buffer de segurança e capacidade de investimento'},{c:'b',l:'Caixa escasso',x:'Pouca margem de segurança — depende de financiamento'}], n:'Apple, Alphabet e Berkshire mantêm posições de caixa de dezenas de biliões.' },
+  net_debt:    { t:'Dívida Líquida', d:'Dívida bruta deduzida do caixa disponível. Representa a dívida "real" se a empresa usasse todo o caixa para a amortizar.', f:'Dívida bruta − Caixa e equivalentes', i:[{c:'g',l:'Negativa',x:'"Caixa líquido" — empresa tem mais caixa que dívida'},{c:'n',l:'Baixa',x:'Endividamento ligeiro e gerível'},{c:'b',l:'Muito alta',x:'Peso financeiro elevado — monitorizar evolução'}], n:'Dívida líquida negativa é raro e muito positivo. Apple e Alphabet estão nesta situação.' },
+  rev_growth:  { t:'Crescimento da Receita', d:'Taxa de variação da receita em relação ao mesmo período do ano anterior. Indica o ritmo de expansão do volume de negócios.', f:'(Receita atual − Receita anterior) ÷ Receita anterior × 100', i:[{c:'g',l:'> 15%',x:'Crescimento forte — empresa em fase de expansão'},{c:'n',l:'5%–15%',x:'Crescimento saudável e sustentável'},{c:'b',l:'Negativo',x:'Contração — investigar causas (setor, macro, competição)'}], n:'Crescimento de receita com margens estáveis é muito mais valioso.' },
+  earn_growth: { t:'Crescimento do Lucro', d:'Taxa de variação do lucro líquido em relação ao período anterior. Mais importante que o crescimento de receita para a criação de valor.', f:'(Lucro atual − Lucro anterior) ÷ Lucro anterior × 100', i:[{c:'g',l:'> 20%',x:'Crescimento de lucros muito acima da média'},{c:'n',l:'5%–20%',x:'Crescimento sólido e sustentável'},{c:'b',l:'Negativo',x:'Deterioração dos lucros — exige análise cuidadosa'}], n:'Lucros a crescer mais que receita indica melhoria de eficiência e margens.' },
+  market_cap:  { t:'Market Cap — Capitalização de Mercado', d:'Valor total de mercado da empresa: quanto custaria comprar todas as ações ao preço atual.', f:'Preço da ação × Número de ações em circulação', i:[{c:'n',l:'< $300M',x:'Micro Cap — alta volatilidade potencial'},{c:'n',l:'$300M–$10B',x:'Small/Mid Cap — equilíbrio risco/crescimento'},{c:'g',l:'> $10B',x:'Large Cap — maior estabilidade e liquidez'}], n:'O mercado pode estar errado no curto prazo, mas converge ao valor intrínseco no longo prazo.' },
+  enterprise_value:{ t:'EV — Valor de Firma', d:'Valor total da empresa incluindo acionistas e credores. Preço teórico de uma aquisição completa da empresa.', f:'Market Cap + Dívida líquida (ou − Caixa líquido)', i:[{c:'g',l:'EV/EBITDA baixo',x:'Empresa potencialmente subavaliada'},{c:'n',l:'EV crescendo',x:'Crescimento natural do negócio'},{c:'b',l:'EV >> Market Cap',x:'Grande dívida líquida — comparar com FCF'}], n:'Mais preciso que Market Cap para comparar empresas com estruturas de capital diferentes.' },
+  shares:      { t:'Número de Ações em Circulação', d:'Total de ações disponíveis no mercado. Define as "fatias" em que se dividem os lucros e o patrimônio da empresa.', f:'Ações emitidas − Ações em tesouraria', i:[{c:'g',l:'Decrescente',x:'Recompra de ações — sinal de confiança da gestão'},{c:'n',l:'Estável',x:'Sem diluição — acionistas protegidos'},{c:'b',l:'Crescente',x:'Emissão de ações dilui os acionistas existentes'}], n:'Buybacks são uma forma eficiente de retornar capital quando a ação está barata.' },
+  prev_close:  { t:'Fecho Anterior', d:'Preço de fecho da sessão de negociação anterior. Ponto de referência para calcular a variação percentual do dia.', f:'Último preço negociado na sessão anterior', i:[{c:'n',l:'Referência base',x:'Calcular a variação % do dia atual'}], n:'Em dias de gap, o preço pode abrir muito acima ou abaixo do fecho anterior.' },
+  open_price:  { t:'Preço de Abertura', d:'Primeiro preço negociado na sessão atual. Pode diferir do fecho anterior por notícias ou eventos durante o período de encerramento.', f:'Primeiro negócio executado na sessão atual', i:[{c:'g',l:'Abertura > Fecho ant.',x:'Gap up — sentimento positivo de mercado'},{c:'b',l:'Abertura < Fecho ant.',x:'Gap down — sentimento negativo ou más notícias'}], n:'Gaps frequentes indicam alta volatilidade ou eventos corporativos relevantes.' },
+  day_low:     { t:'Mínimo do Dia', d:'Preço mais baixo atingido durante a sessão atual. Juntamente com o máximo, define o intervalo de negociação do dia.', f:'Menor preço de transação na sessão atual', i:[{c:'n',l:'Fecho perto do mínimo',x:'Sessão negativa — pressão vendedora persistente'},{c:'g',l:'Fecho longe do mínimo',x:'Recuperou bem dos mínimos — sinal positivo'}], n:'A amplitude máx-mín indica a volatilidade intradiária da sessão.' },
+  day_high:    { t:'Máximo do Dia', d:'Preço mais alto atingido durante a sessão atual. Indica o nível de resistência que o preço atingiu hoje.', f:'Maior preço de transação na sessão atual', i:[{c:'g',l:'Fecho perto do máximo',x:'Sessão forte — compradores dominaram'},{c:'n',l:'Fecho a meio do range',x:'Indecisão entre compradores e vendedores'}], n:'Máximos históricos são frequentemente níveis de resistência psicológica relevantes.' },
+  week52_low:  { t:'Mínimo das 52 Semanas', d:'Preço mais baixo atingido pela ação nos últimos 12 meses. Nível de suporte técnico importante.', f:'Menor preço de fecho nos últimos 252 dias de negociação', i:[{c:'b',l:'Perto do mínimo',x:'Ação em tendência descendente — alto risco'},{c:'g',l:'Recuperou > 50%',x:'Boa recuperação desde os mínimos anuais'}], n:'Ação perto dos mínimos de 52 semanas pode ser oportunidade ou armadilha — analisar fundamentos.' },
+  week52_high: { t:'Máximo das 52 Semanas', d:'Preço mais alto atingido pela ação nos últimos 12 meses. Nível de resistência técnica importante.', f:'Maior preço de fecho nos últimos 252 dias de negociação', i:[{c:'g',l:'Perto do máximo',x:'Ação em força — tendência de alta'},{c:'n',l:'Abaixo 20%',x:'Queda significativa dos máximos anuais'}], n:'Quebrar acima do máximo de 52 semanas (breakout) é um sinal de força muito procurado.' },
+  bid_ask:     { t:'Bid / Ask — Oferta / Pedido', d:'Bid: melhor preço que um comprador oferece. Ask: menor preço a que um vendedor aceita vender. A diferença é o spread — custo implícito de transação.', f:'Spread = Ask − Bid', i:[{c:'g',l:'Spread pequeno',x:'Ação líquida — fácil de comprar e vender'},{c:'b',l:'Spread grande',x:'Baixa liquidez — custo de transação elevado'}], n:'Em ações de grande cap (Apple, Amazon) o spread é frequentemente inferior a $0.01.' },
+  volume:      { t:'Volume de Negociação', d:'Número total de ações transacionadas na sessão atual. Confirma ou questiona a validade dos movimentos de preço.', f:'Soma de todas as ações compradas e vendidas na sessão', i:[{c:'g',l:'Volume >> Média',x:'Alta convicção — movimento de preço fiável'},{c:'n',l:'Volume ≈ Média',x:'Atividade normal para o título'},{c:'b',l:'Volume << Média',x:'Baixa convicção — movimento pode ser enganador'}], n:'Subida com volume alto = muito bullish. Subida com volume baixo = sinal fraco.' },
+  avg_volume:  { t:'Volume Médio (3 meses)', d:'Média diária de ações transacionadas nos últimos 3 meses. Referência para avaliar se o volume atual é normal ou excecional.', f:'Soma dos volumes diários ÷ Nº de sessões (≈63 dias)', i:[{c:'g',l:'> 1M/dia',x:'Muito líquida — fácil executar ordens grandes'},{c:'n',l:'100K–1M/dia',x:'Liquidez razoável para a maioria dos investidores'},{c:'b',l:'< 100K/dia',x:'Baixa liquidez — cuidado com ordens grandes'}], n:'Volumes anormalmente altos antecedem frequentemente comunicados relevantes.' },
+  ma50:        { t:'Média Móvel 50 Dias (MM50)', d:'Média dos preços de fecho dos últimos 50 dias de negociação. Indicador de tendência de médio prazo muito seguido por traders e analistas.', f:'Soma dos últimos 50 preços de fecho ÷ 50', i:[{c:'g',l:'Preço > MM50',x:'Tendência de médio prazo positiva (bullish)'},{c:'b',l:'Preço < MM50',x:'Tendência de médio prazo negativa (bearish)'}], n:'Cruzamento MM50 acima de MM200 = "Golden Cross" (sinal de compra). Abaixo = "Death Cross".' },
+  ma200:       { t:'Média Móvel 200 Dias (MM200)', d:'Média dos preços de fecho dos últimos 200 dias. O indicador de tendência de longo prazo mais seguido por fundos e investidores institucionais.', f:'Soma dos últimos 200 preços de fecho ÷ 200', i:[{c:'g',l:'Preço > MM200',x:'Tendência de longo prazo positiva — mercado bull'},{c:'b',l:'Preço < MM200',x:'Tendência de longo prazo negativa — mercado bear'}], n:'Warren Buffett e muitos institucionais usam a MM200 como filtro de tendência primária.' },
+};
+
+/* ── Label → key map ─────────────────────────────────── */
+var LM = {
+  'P/L (P/E)':'pe_ratio','P/L Forward':'forward_pe','PEG Ratio':'peg_ratio',
+  'D.Y (Div. Yield)':'div_yield','D.Y (Yield)':'div_yield',
+  'P/VP (P/B)':'pb_ratio','P/SR (P/S)':'ps_ratio',
+  'EV/EBITDA':'ev_ebitda','EV/Revenue':'ev_revenue',
+  'LPA (EPS)':'eps','VPA (Book/Share)':'book_value',
+  'Margem Bruta':'gross_margin','Margem EBITDA':'ebitda_margin',
+  'Margem EBIT':'op_margin','Margem Líquida':'net_margin',
+  'Receita Total':'revenue','EBITDA':'ebitda','Free Cash Flow':'free_cash',
+  'ROE':'roe','ROA':'roa',
+  'Dívida/PL':'debt_equity','Liq. Corrente':'current_ratio',
+  'Dívida Bruta':'total_debt','Caixa':'cash','Dívida Líquida':'net_debt',
+  'Cresc. Receita':'rev_growth','Cresc. Lucro':'earn_growth',
+  'Market Cap':'market_cap','Valor de Firma (EV)':'enterprise_value',
+  'Nº de Ações':'shares',
+  'Fecho Anterior':'prev_close','Abertura':'open_price',
+  'Mín. hoje':'day_low','Máx. hoje':'day_high',
+  'Mín. 52 sem.':'week52_low','Máx. 52 sem.':'week52_high',
+  'Bid / Ask':'bid_ask','Volume':'volume','Vol. Médio':'avg_volume',
+  'Média 50 dias':'ma50','Média 200 dias':'ma200',
+};
+
+/* ── Tooltip element ─────────────────────────────────── */
+var tt = document.createElement('div');
+tt.id = 'trt-tt';
+document.body.appendChild(tt);
+
+var _hideTimer = null;
+var _activeBtn = null;
+
+function buildContent(key) {
+  var d = D[key];
+  if (!d) return '';
+  var h = '<div class="tt-title">' + d.t + '</div>';
+  h += '<div class="tt-desc">' + d.d + '</div>';
+  if (d.f) {
+    h += '<div class="tt-section"><div class="tt-slbl">Fórmula</div><code class="tt-formula">' + d.f + '</code></div>';
+  }
+  if (d.i && d.i.length) {
+    h += '<div class="tt-section"><div class="tt-slbl">Interpretação</div><div class="tt-items">';
+    d.i.forEach(function(item) {
+      h += '<div class="tt-item ' + item.c + '"><span class="tt-il">' + item.l + '</span><span class="tt-it">' + item.x + '</span></div>';
+    });
+    h += '</div></div>';
+  }
+  if (d.n) h += '<div class="tt-note">' + d.n + '</div>';
+  return h;
+}
+
+function positionTooltip(btn) {
+  var r  = btn.getBoundingClientRect();
+  var vw = window.innerWidth;
+  var vh = window.innerHeight;
+  var ttW = Math.min(262, vw - 16);
+
+  /* forçar reflow para medir a altura real do conteúdo */
+  void tt.offsetHeight;
+  var ttH = tt.getBoundingClientRect().height || tt.offsetHeight || 320;
+
+  /* escolher lado: abaixo por defeito, acima se não há espaço */
+  var spaceBelow = vh - r.bottom - 14;
+  var spaceAbove = r.top - 14;
+  var above = spaceBelow < ttH && spaceAbove > spaceBelow;
+
+  /* horizontal: centrado no botão, clamped ao viewport */
+  var left = r.left + r.width / 2 - ttW / 2;
+  left = Math.max(8, Math.min(vw - ttW - 8, left));
+
+  /* vertical */
+  var top = above ? (r.top - ttH - 10) : (r.bottom + 10);
+  /* clamping vertical — nunca sai do viewport */
+  top = Math.max(8, Math.min(vh - ttH - 8, top));
+
+  tt.style.width = ttW + 'px';
+  tt.style.left  = left + 'px';
+  tt.style.top   = top + 'px';
+  tt.classList.toggle('tt-above', above);
+  tt.classList.toggle('tt-below', !above);
+
+  /* posição da seta apontada ao botão */
+  var arrowX = r.left + r.width / 2 - left;
+  tt.style.setProperty('--aw', Math.max(12, Math.min(ttW - 20, arrowX)) + 'px');
+}
+
+function showTT(key, btn) {
+  clearTimeout(_hideTimer);
+  if (_activeBtn && _activeBtn !== btn) _activeBtn.classList.remove('tt-active');
+  _activeBtn = btn;
+  btn.classList.add('tt-active');
+  tt.innerHTML = buildContent(key);
+  tt.style.opacity = '';        /* limpa qualquer inline override */
+  tt.classList.remove('tt-on'); /* reset para que a transição re-dispare */
+  /* dois rAF garantem um frame entre remove e add, activando a transição */
+  requestAnimationFrame(function() {
+    positionTooltip(btn);
+    requestAnimationFrame(function() { tt.classList.add('tt-on'); });
+  });
+}
+
+function hideTT(delay) {
+  _hideTimer = setTimeout(function() {
+    tt.classList.remove('tt-on');
+    if (_activeBtn) { _activeBtn.classList.remove('tt-active'); _activeBtn = null; }
+  }, delay || 0);
+}
+
+/* Keep tooltip alive when hovering over it */
+tt.addEventListener('mouseenter', function() { clearTimeout(_hideTimer); });
+tt.addEventListener('mouseleave', function() { hideTT(120); });
+
+/* Click outside */
+document.addEventListener('click', function(e) {
+  if (!tt.contains(e.target) && !e.target.classList.contains('tt-btn')) hideTT(0);
+}, true);
+
+/* Escape key */
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') hideTT(0); });
+
+/* ── Inject buttons ──────────────────────────────────── */
+function injectButtons() {
+  var selectors = '.ind-label, .stat-label, .balance-label';
+  document.querySelectorAll(selectors).forEach(function(el) {
+    var text = el.textContent.trim();
+    var key  = LM[text];
+    if (!key || !D[key]) return;
+
+    /* Wrap text in span, make label a flex row */
+    var span = document.createElement('span');
+    span.textContent = text;
+    span.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0';
+
+    var btn = document.createElement('button');
+    btn.className = 'tt-btn';
+    btn.setAttribute('aria-label', 'Info: ' + text);
+    btn.textContent = 'i';
+    btn.setAttribute('data-key', key);
+
+    btn.addEventListener('mouseenter', function() { clearTimeout(_hideTimer); showTT(key, btn); });
+    btn.addEventListener('mouseleave', function() { hideTT(160); });
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (tt.classList.contains('tt-on') && _activeBtn === btn) { hideTT(0); }
+      else { showTT(key, btn); }
+    });
+
+    el.innerHTML = '';
+    el.style.cssText = 'display:flex;align-items:center;gap:5px;white-space:normal;overflow:visible;text-overflow:unset;margin-bottom:' + (el.style.marginBottom || '5px');
+    el.appendChild(span);
+    el.appendChild(btn);
+  });
+}
+
+injectButtons();
+
+})();
 </script>
 {% endblock %}

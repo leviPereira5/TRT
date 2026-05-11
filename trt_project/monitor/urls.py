@@ -16,6 +16,7 @@ urlpatterns = [
     path('settings/',                  views.settings_view, name='settings'),
     path('monitor/run/',               views.run_monitor,   name='run_monitor'),
     path('settings/test-ntfy/',        views.test_ntfy,     name='test_ntfy'),
+    path('settings/test-email/',       views.test_email,    name='test_email'),
     path('alerts/',                    views.alert_history, name='alert_history'),
     path('search/', views.search, name='search'),
     path('search/suggest/', views.search_suggest, name='search_suggest'),

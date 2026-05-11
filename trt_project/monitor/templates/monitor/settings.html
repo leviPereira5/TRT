@@ -9,57 +9,33 @@
     <div class="msg-{{ msg.tags }}">{{ msg }}</div>
     {% endfor %}
 
-    <!-- ── Configurações de Alerta ── -->
+    <form method="post" id="settings-form">
+    {% csrf_token %}
+
+    <!-- ── Monitorização ── -->
     <div class="card">
-        <div class="section-title">Configurações de Alerta</div>
-        <form method="post">
-            {% csrf_token %}
-            {% for field in form %}
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                {{ field }}
-                {% if field.name == 'ntfy_topic' %}
-                    <div class="hint">Nome do tópico ntfy.sh (ex: <code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:11px;">trt-alertas-miguelbr</code>). Escolhe um nome único e secreto.</div>
-                {% endif %}
-                {% if field.name == 'monitoring_interval' %}
-                    <div class="hint">Intervalo em segundos entre cada ciclo de monitorização (1 – 3600 s).</div>
-                {% endif %}
-                {% if field.name == 'alert_threshold_high' %}
-                    <div class="hint">Percentagem de subida que dispara um alerta de alta.</div>
-                {% endif %}
-                {% if field.name == 'alert_threshold_low' %}
-                    <div class="hint">Percentagem de descida que dispara um alerta de baixa.</div>
-                {% endif %}
-                {% if field.errors %}<p style="color:#dc2626;font-size:13px;margin-top:4px">{{ field.errors.as_text }}</p>{% endif %}
-            {% endfor %}
-            <button class="btn btn-primary" type="submit">Guardar configurações</button>
-        </form>
+        <div class="section-title">Monitorização</div>
+        <label for="{{ form.monitoring_interval.id_for_label }}">{{ form.monitoring_interval.label }}</label>
+        {{ form.monitoring_interval }}
+        <div class="hint">Intervalo em segundos entre cada ciclo de monitorização (1 – 3600 s).</div>
+        {% if form.monitoring_interval.errors %}<p style="color:#dc2626;font-size:13px;margin-top:4px">{{ form.monitoring_interval.errors.as_text }}</p>{% endif %}
     </div>
 
-    <!-- ── Estado das Notificações ntfy ── -->
+    <!-- ── Notificações Push (ntfy.sh) ── -->
     <div class="card">
-        <div class="section-title">Estado das Notificações</div>
+        <div class="section-title">Notificações Push (ntfy.sh)</div>
+
+        <label for="{{ form.ntfy_topic.id_for_label }}">{{ form.ntfy_topic.label }}</label>
+        {{ form.ntfy_topic }}
+        <div class="hint">Nome do tópico ntfy.sh (ex: <code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:11px;">trt-alertas-miguelbr</code>). Escolhe um nome único e secreto.</div>
+        {% if form.ntfy_topic.errors %}<p style="color:#dc2626;font-size:13px;margin-top:4px">{{ form.ntfy_topic.errors.as_text }}</p>{% endif %}
 
         {% if settings.ntfy_topic %}
-        <div class="msg-success" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:10px;margin-bottom:16px;">
+        <div class="msg-success" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:10px;margin-top:16px;margin-bottom:8px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             <div>
                 <div style="font-size:13px;font-weight:700;">ntfy.sh configurado</div>
                 <div style="font-size:12px;opacity:.8;">ntfy.sh/{{ settings.ntfy_topic }}</div>
-            </div>
-        </div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">
-            Clica em <strong>Enviar notificação de teste</strong> para confirmar que as alertas chegam ao teu telemóvel.
-        </p>
-        <a href="{% url 'test_ntfy' %}" class="btn btn-add" style="display:inline-flex;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            Enviar notificação de teste
-        </a>
-        {% else %}
-        <div class="msg-warning" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:10px;margin-bottom:16px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            <div>
-                <div style="font-size:13px;font-weight:700;">Notificações não configuradas</div>
-                <div style="font-size:12px;opacity:.8;">Define um tópico ntfy.sh acima para receber alertas no telemóvel.</div>
             </div>
         </div>
         {% endif %}
@@ -67,7 +43,7 @@
         <!-- Instruções ntfy -->
         <details style="margin-top:16px;">
             <summary style="font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;user-select:none;letter-spacing:.3px;text-transform:uppercase;">
-                Como configurar notificações push (ntfy.sh) — grátis, sem conta
+                Como configurar notificações push (ntfy.sh)
             </summary>
             <div style="margin-top:12px;font-size:13px;color:var(--muted);line-height:1.7;border-left:3px solid var(--y);padding-left:14px;">
                 <ol style="padding-left:18px;display:flex;flex-direction:column;gap:8px;">
@@ -82,11 +58,98 @@
         </details>
     </div>
 
-    <!-- ── Monitorização ── -->
+    <!-- ── Alertas por Email ── -->
     <div class="card">
-        <div class="section-title">Monitorização</div>
+        <div class="section-title">Alertas por Email</div>
         <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px;">
-            O ciclo de monitorização verifica os preços dos ativos ativos e dispara alertas quando os limiares são atingidos.
+            Recebe um email automático sempre que um ativo atinge o limiar configurado. Requer uma conta Gmail com
+            <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color:var(--accent);">password de aplicação</a> ativa.
+        </p>
+
+        <!-- Toggle email enabled -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+            {{ form.email_enabled }}
+            <label for="{{ form.email_enabled.id_for_label }}" style="font-size:14px;font-weight:600;cursor:pointer;">{{ form.email_enabled.label }}</label>
+        </div>
+
+        <div id="email-fields" style="display:flex;flex-direction:column;gap:12px;{% if not settings.email_enabled %}opacity:.5;pointer-events:none;{% endif %}">
+            <div>
+                <label for="{{ form.email_address.id_for_label }}">{{ form.email_address.label }}</label>
+                {{ form.email_address }}
+                <div class="hint">Email onde vais receber os alertas.</div>
+                {% if form.email_address.errors %}<p style="color:#dc2626;font-size:13px;margin-top:4px">{{ form.email_address.errors.as_text }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.smtp_user.id_for_label }}">{{ form.smtp_user.label }}</label>
+                {{ form.smtp_user }}
+                <div class="hint">Email Gmail usado para enviar os alertas (ex: <code style="background:var(--bg);padding:1px 5px;border-radius:4px;font-size:11px;">trt.alertas@gmail.com</code>).</div>
+                {% if form.smtp_user.errors %}<p style="color:#dc2626;font-size:13px;margin-top:4px">{{ form.smtp_user.errors.as_text }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.smtp_password.id_for_label }}">{{ form.smtp_password.label }}</label>
+                {{ form.smtp_password }}
+                <div class="hint">Password de aplicação Gmail (16 caracteres, gerada em <em>Conta Google → Segurança → Passwords de aplicação</em>).</div>
+                {% if form.smtp_password.errors %}<p style="color:#dc2626;font-size:13px;margin-top:4px">{{ form.smtp_password.errors.as_text }}</p>{% endif %}
+            </div>
+
+            <!-- Campos avançados SMTP -->
+            <details>
+                <summary style="font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;user-select:none;letter-spacing:.3px;text-transform:uppercase;">Configurações SMTP avançadas</summary>
+                <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;">
+                    <div>
+                        <label for="{{ form.smtp_host.id_for_label }}">{{ form.smtp_host.label }}</label>
+                        {{ form.smtp_host }}
+                    </div>
+                    <div>
+                        <label for="{{ form.smtp_port.id_for_label }}">{{ form.smtp_port.label }}</label>
+                        {{ form.smtp_port }}
+                    </div>
+                </div>
+            </details>
+        </div>
+
+        {% if settings.email_enabled and settings.email_address %}
+        <div class="msg-success" style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-radius:10px;margin-top:16px;margin-bottom:8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <div>
+                <div style="font-size:13px;font-weight:700;">Email configurado</div>
+                <div style="font-size:12px;opacity:.8;">Alertas enviados para {{ settings.email_address }}</div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Botão guardar -->
+    <button class="btn btn-primary" type="submit" style="align-self:flex-start;">Guardar configurações</button>
+
+    </form>
+
+    <!-- ── Botões de teste (fora do form) ── -->
+    {% if settings.ntfy_topic or settings.email_enabled %}
+    <div class="card">
+        <div class="section-title">Testar notificações</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            {% if settings.ntfy_topic %}
+            <a href="{% url 'test_ntfy' %}" class="btn btn-add" style="display:inline-flex;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                Testar notificação push
+            </a>
+            {% endif %}
+            {% if settings.email_enabled and settings.email_address %}
+            <a href="{% url 'test_email' %}" class="btn btn-monitor" style="display:inline-flex;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                Testar email
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- ── Ciclo de monitorização ── -->
+    <div class="card">
+        <div class="section-title">Ciclo de monitorização</div>
+        <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px;">
+            O ciclo verifica os preços dos ativos ativos e dispara alertas (push e email) quando os limiares são atingidos.
             Podes executá-lo manualmente ou iniciar o daemon contínuo via terminal.
         </p>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
@@ -106,4 +169,13 @@
     </div>
 
 </div>
+
+<script>
+    const toggle = document.getElementById('{{ form.email_enabled.id_for_label }}');
+    const fields = document.getElementById('email-fields');
+    toggle.addEventListener('change', () => {
+        fields.style.opacity = toggle.checked ? '1' : '.5';
+        fields.style.pointerEvents = toggle.checked ? '' : 'none';
+    });
+</script>
 {% endblock %}

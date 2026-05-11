@@ -4,6 +4,10 @@
    Layout: sidebar fixa à esquerda + conteúdo à direita
    ============================================================ */
 
+/* Evita flash branco: html.dark é aplicado antes do body existir (script no topo do head) */
+html.dark { background: #0d0f14; color-scheme: dark; }
+html.dark body { background: #0d0f14; color: #e4e4e8; }
+
 /* ── Tokens ── */
 :root {
     --y:       #FFD600;
@@ -705,6 +709,8 @@ label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); 
 .badge-br     { background: #dcfce7; color: #15803d; }
 .badge-fii    { background: #fef9c3; color: #a16207; }
 .badge-crypto { background: #f3e8ff; color: #7c3aed; }
+.badge-eu     { background: #e0f2fe; color: #0369a1; }
+.badge-cn     { background: #fee2e2; color: #b91c1c; }
 .badge-high   { background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 700; }
 .badge-low    { background: #fee2e2; color: #b91c1c; padding: 2px 8px; border-radius: 100px; font-size: 11px; font-weight: 700; }
 .badge-EQUITY { background: #dbeafe; color: #1d4ed8; }
@@ -1350,6 +1356,8 @@ body.dark .badge-us     { background: rgba(29,78,216,.15);  color: #93c5fd; }
 body.dark .badge-br     { background: rgba(21,128,61,.15);  color: #86efac; }
 body.dark .badge-fii    { background: rgba(161,98,7,.15);   color: #fde047; }
 body.dark .badge-crypto { background: rgba(124,58,237,.15); color: #c4b5fd; }
+body.dark .badge-eu     { background: rgba(3,105,161,.15);  color: #7dd3fc; }
+body.dark .badge-cn     { background: rgba(185,28,28,.15);  color: #fca5a5; }
 body.dark .sb-theme { border-color: rgba(255,255,255,.06); }
 
 /* ── DARK MODE — Correções completas de legibilidade ──
