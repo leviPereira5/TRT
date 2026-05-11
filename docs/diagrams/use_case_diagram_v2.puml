@@ -1,47 +1,67 @@
 @startuml
 left to right direction
 
-actor Utilizador as U
-actor "API Mercado Financeiro" as API
-actor "Serviço de Notificação" as NS
+actor "Utilizador" as U
+actor "API yfinance" as API
+actor "ntfy.sh" as NTFY
+actor "Yahoo Screener\n/ API BCB" as EXT
 
-rectangle "Financial Market Monitoring System" {
+rectangle "TRT Invest — Financial Market Monitoring System" {
 
-  usecase "Gerir ações monitorizadas" as UC1
-  usecase "Configurar limites de alerta" as UC2
-  usecase "Configurar intervalo de monitorização" as UC3
+  ' Auth
+  usecase "Autenticar utilizador\n(login / registo / visitante)" as UC10
 
-  usecase "Monitorizar ações" as UC9
-  usecase "Consultar cotação" as UC4
-  usecase "Calcular variação percentual" as UC5
-  usecase "Verificar limites de alerta" as UC10
-  usecase "Evitar notificações duplicadas" as UC8
-  usecase "Enviar notificação" as UC6
-  usecase "Registar histórico de alertas" as UC7
+  ' Gestão de portfolio
+  usecase "Gerir ações monitorizadas\n(adicionar, remover, pausar,\nlimiares por ativo)" as UC01
+
+  ' Configuração
+  usecase "Configurar intervalo\ne tópico ntfy.sh" as UC02
+
+  ' Monitorização automática
+  usecase "Monitorizar ações\n(ciclo automático)" as UC09
+  usecase "Consultar cotação" as UC04
+  usecase "Calcular variação percentual" as UC05
+
+  ' Alertas
+  usecase "Enviar notificação push\n(ntfy.sh)" as UC06
+  usecase "Evitar notificações\nduplicadas (60 min)" as UC08
+  usecase "Registar histórico\nde alertas" as UC07
+
+  ' Descoberta
+  usecase "Pesquisar ativos mundiais\n(+ autocomplete)" as UC11
+  usecase "Consultar detalhe de ativo\n(fundamentais + gráfico)" as UC12
+
+  ' Dashboard
+  usecase "Visualizar visão geral\ndo mercado\n(top movers, BCB, Tesouro)" as UC13
+
 }
 
-' Utilizador
-U --> UC1
-U --> UC2
-U --> UC3
-U --> UC9
+' Utilizador inicia
+U --> UC10
+U --> UC01
+U --> UC02
+U --> UC11
+U --> UC12
+U --> UC13
 
-' Sistemas externos
-API --> UC4
-NS --> UC6
+' Monitorização automática (daemon)
+UC09 ..> UC04 : <<include>>
+UC09 ..> UC05 : <<include>>
+UC09 ..> UC06 : <<extend>>
 
-' Fluxo principal de monitorização
-UC9 ..> UC4 : <<include>>
-UC9 ..> UC5 : <<include>>
-UC9 ..> UC10 : <<include>>
+' Notificação
+UC06 ..> UC08 : <<include>>
+UC06 ..> UC07 : <<include>>
 
-' Regras internas
-UC10 ..> UC8 : <<include>>
+' Detalhe pode adicionar ao portfolio
+UC12 ..> UC01 : <<extend>>
 
-' Notificação só acontece quando necessário (extend é mais correto aqui)
-UC6 ..> UC10 : <<extend>>
-
-' Registo de histórico sempre que há notificação
-UC7 ..> UC6 : <<include>>
+' APIs externas
+UC04 --> API
+UC12 --> API
+UC13 --> API
+UC11 --> EXT
+UC13 --> EXT
+UC06 --> NTFY
 
 @enduml
