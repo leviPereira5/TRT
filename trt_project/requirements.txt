@@ -1,0 +1,8 @@
+Django==6.0.4
+gunicorn==26.0.0
+whitenoise==6.12.0
+python-dotenv==1.2.2
+requests==2.33.1
+yfinance==1.3.0
+social-auth-app-django==5.9.0
+social-auth-core==4.9.1
