@@ -539,6 +539,9 @@ html.dark .ico-moon { display: block; }
     margin-bottom: 16px;
     padding-left: 12px;
     border-left: 3px solid var(--y);
+    display: flex;
+    align-items: center;
+    gap: 7px;
 }
 
 .chart-title {
@@ -1205,6 +1208,9 @@ html.dark .tesouro-card.unavailable .tesouro-tipo { background: rgba(255,255,255
     cursor: pointer;
     transition: all .18s;
     font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .top10-tab:hover {
