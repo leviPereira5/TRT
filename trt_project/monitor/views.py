@@ -214,13 +214,15 @@ def stock_detail(request, symbol_yf):
         'ebitda':      _fmt(info.get('ebitda')),
         'free_cash':   _fmt(info.get('freeCashflow')),
     }
-    hist = ticker.history(period='1mo')
+    hist = ticker.history(period='1y')
     chart_labels = []
     chart_data   = []
+    vol_data     = []
     if not hist.empty:
         for idx, row in hist.iterrows():
             chart_labels.append(str(idx)[:10])
             chart_data.append(round(float(row['Close']), 2))
+            vol_data.append(int(row['Volume']) if row['Volume'] and row['Volume'] == row['Volume'] else 0)
     if request.method == 'POST':
         action = request.POST.get('action')
         if action == 'add' and not Stock.objects.filter(symbol=symbol_yf).exists():
@@ -256,6 +258,7 @@ def stock_detail(request, symbol_yf):
         'prices':       prices,
         'chart_labels': chart_labels,
         'chart_data':   chart_data,
+        'vol_data':     vol_data,
     })
 
 

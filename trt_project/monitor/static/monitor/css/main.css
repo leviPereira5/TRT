@@ -647,6 +647,17 @@ html.dark .ico-moon { display: block; }
 .market-card .change.up   { background: #dcfce7; color: var(--green); }
 .market-card .change.down { background: #fee2e2; color: var(--red); }
 
+.mc-spark {
+    margin-top: 10px;
+    height: 36px;
+    overflow: hidden;
+}
+.mc-spark svg {
+    width: 100%;
+    height: 36px;
+    display: block;
+}
+
 /* ══════════════════════════════════════════
    TABLE
    ══════════════════════════════════════════ */
@@ -766,6 +777,59 @@ label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); 
 .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; position: relative; z-index: 1; }
 .hero .up   { color: #4ade80; }
 .hero .down { color: #f87171; }
+
+/* ── 52-week range ── */
+.range52-track {
+    position: relative;
+    height: 6px;
+    background: var(--line);
+    border-radius: 6px;
+    overflow: visible;
+}
+.range52-fill {
+    height: 100%;
+    background: linear-gradient(90deg, rgba(255,214,0,.3), #FFD600);
+    border-radius: 6px;
+    max-width: 100%;
+}
+.range52-dot {
+    position: absolute;
+    top: -4px;
+    width: 14px; height: 14px;
+    background: #FFD600;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0,0,0,.2);
+}
+
+/* ── Period selector ── */
+.period-btns { display: flex; gap: 4px; }
+.period-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1.5px solid var(--line);
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    transition: all .15s;
+}
+.period-btn:hover { border-color: var(--y); color: var(--ink); }
+.period-btn.active { background: var(--y); border-color: var(--y); color: #0a0a0a; }
+
+/* ── Margins bar chart ── */
+.margins-chart { display: flex; flex-direction: column; gap: 12px; }
+.margin-row { display: flex; align-items: center; gap: 10px; }
+.margin-label { font-size: 11px; font-weight: 700; color: var(--muted); width: 80px; flex-shrink: 0; text-align: right; }
+.margin-track {
+    flex: 1;
+    height: 8px;
+    background: var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+}
+.margin-fill { height: 100%; border-radius: 6px; transition: width .6s cubic-bezier(.4,0,.2,1); min-width: 2px; }
+.margin-val { font-size: 12px; font-weight: 700; color: var(--ink); width: 52px; flex-shrink: 0; }
 
 /* ══════════════════════════════════════════
    STATS GRID
@@ -1272,7 +1336,7 @@ html.dark .top10-change.down    { background: rgba(255,255,255,.06); color: rgba
     font-size: 12px;
 }
 
-.bar-name { font-weight: 600; color: var(--ink); }
+.bar-name { font-weight: 600; color: var(--ink); display: inline-flex; align-items: center; gap: 5px; }
 .bar-pct  { font-weight: 700; font-size: 11.5px; }
 
 .bar-track {
@@ -1481,6 +1545,13 @@ html.dark .ind-tabs    { border-bottom-color: rgba(255,255,255,.1); }
 html.dark .balance-card  { background: #1c1f28; border-color: rgba(255,255,255,.08); }
 html.dark .balance-label { color: rgba(255,255,255,.35); }
 html.dark .balance-value { color: #e4e4e8; }
+
+/* 52-week range & period buttons (dark) */
+html.dark .range52-dot  { border-color: #1c1f28; }
+html.dark .period-btn   { color: rgba(255,255,255,.4); border-color: rgba(255,255,255,.12); }
+html.dark .period-btn:hover { border-color: #FFD600; color: #e4e4e8; }
+html.dark .period-btn.active { background: #FFD600; border-color: #FFD600; color: #0a0a0a; }
+html.dark .margin-val   { color: #e4e4e8; }
 
 /* Portfolio / stock list */
 html.dark .status-paused { color: rgba(255,255,255,.25); }

@@ -179,10 +179,16 @@ def fetch_price(symbol):
 
 def _fetch_single(symbol):
     try:
-        info  = yf.Ticker(symbol).info
-        price = info.get("regularMarketPrice") or info.get("currentPrice") or info.get("previousClose")
-        prev  = info.get("previousClose")
+        ticker = yf.Ticker(symbol)
+        info   = ticker.info
+        price  = info.get("regularMarketPrice") or info.get("currentPrice") or info.get("previousClose")
+        prev   = info.get("previousClose")
         change_pct = round(((price - prev) / prev) * 100, 2) if price and prev else 0
+        try:
+            hist  = ticker.history(period='10d', interval='1d')['Close'].dropna().tolist()
+            spark = [round(p, 4) for p in hist] if len(hist) >= 2 else []
+        except Exception:
+            spark = []
         return {
             'symbol':     symbol.replace('.SA', '').replace('-USD', ''),
             'symbol_yf':  symbol,
@@ -191,6 +197,7 @@ def _fetch_single(symbol):
             'change_pct': change_pct,
             'currency':   info.get('currency', ''),
             'logo_url':   info.get('logo_url', ''),
+            'spark':      spark,
         }
     except Exception as e:
         logger.warning(f"Erro ao obter {symbol}: {e}")

@@ -308,7 +308,7 @@
         </div>
         <div id="all_us-cards" class="cards">
             {% for item in overview.us %}
-            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}" data-spark="{{ item.spark|join:',' }}" data-up="{% if item.change_pct >= 0 %}1{% else %}0{% endif %}">
                 <div class="mc-header">
                     <div class="mc-logo">
                         {% if item.logo_url %}<img src="{{ item.logo_url }}" alt="{{ item.symbol }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="mc-logo-fallback" style="display:none">{{ item.symbol|first }}</span>{% else %}<span class="mc-logo-fallback">{{ item.symbol|first }}</span>{% endif %}
@@ -317,6 +317,7 @@
                 </div>
                 <div class="price">{{ item.currency }} {{ item.price }}</div>
                 <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
+                <div class="mc-spark"></div>
             </a>
             {% endfor %}
         </div>
@@ -345,7 +346,7 @@
         </div>
         <div id="all_br-cards" class="cards">
             {% for item in overview.br %}
-            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}" data-spark="{{ item.spark|join:',' }}" data-up="{% if item.change_pct >= 0 %}1{% else %}0{% endif %}">
                 <div class="mc-header">
                     <div class="mc-logo">
                         {% if item.logo_url %}<img src="{{ item.logo_url }}" alt="{{ item.symbol }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="mc-logo-fallback" style="display:none">{{ item.symbol|first }}</span>{% else %}<span class="mc-logo-fallback">{{ item.symbol|first }}</span>{% endif %}
@@ -354,6 +355,7 @@
                 </div>
                 <div class="price">R$ {{ item.price }}</div>
                 <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
+                <div class="mc-spark"></div>
             </a>
             {% endfor %}
         </div>
@@ -381,7 +383,7 @@
         </div>
         <div id="all_fii-cards" class="cards">
             {% for item in overview.fii %}
-            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}" data-spark="{{ item.spark|join:',' }}" data-up="{% if item.change_pct >= 0 %}1{% else %}0{% endif %}">
                 <div class="mc-header">
                     <div class="mc-logo">
                         {% if item.logo_url %}<img src="{{ item.logo_url }}" alt="{{ item.symbol }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="mc-logo-fallback" style="display:none">{{ item.symbol|first }}</span>{% else %}<span class="mc-logo-fallback">{{ item.symbol|first }}</span>{% endif %}
@@ -390,6 +392,7 @@
                 </div>
                 <div class="price">R$ {{ item.price }}</div>
                 <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
+                <div class="mc-spark"></div>
             </a>
             {% endfor %}
         </div>
@@ -417,7 +420,7 @@
         </div>
         <div id="all_crypto-cards" class="cards">
             {% for item in overview.crypto %}
-            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}" data-spark="{{ item.spark|join:',' }}" data-up="{% if item.change_pct >= 0 %}1{% else %}0{% endif %}">
                 <div class="mc-header">
                     <div class="mc-logo">
                         {% if item.logo_url %}<img src="{{ item.logo_url }}" alt="{{ item.symbol }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="mc-logo-fallback" style="display:none">{{ item.symbol|first }}</span>{% else %}<span class="mc-logo-fallback">{{ item.symbol|first }}</span>{% endif %}
@@ -426,6 +429,7 @@
                 </div>
                 <div class="price">$ {{ item.price }}</div>
                 <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
+                <div class="mc-spark"></div>
             </a>
             {% endfor %}
         </div>
@@ -453,7 +457,7 @@
         </div>
         <div id="all_eu-cards" class="cards">
             {% for item in overview.eu %}
-            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}" data-spark="{{ item.spark|join:',' }}" data-up="{% if item.change_pct >= 0 %}1{% else %}0{% endif %}">
                 <div class="mc-header">
                     <div class="mc-logo">
                         {% if item.logo_url %}<img src="{{ item.logo_url }}" alt="{{ item.symbol }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="mc-logo-fallback" style="display:none">{{ item.symbol|first }}</span>{% else %}<span class="mc-logo-fallback">{{ item.symbol|first }}</span>{% endif %}
@@ -462,6 +466,7 @@
                 </div>
                 <div class="price">{{ item.currency }} {{ item.price }}</div>
                 <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
+                <div class="mc-spark"></div>
             </a>
             {% endfor %}
         </div>
@@ -490,7 +495,7 @@
         </div>
         <div id="all_cn-cards" class="cards">
             {% for item in overview.cn %}
-            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}" data-spark="{{ item.spark|join:',' }}" data-up="{% if item.change_pct >= 0 %}1{% else %}0{% endif %}">
                 <div class="mc-header">
                     <div class="mc-logo">
                         {% if item.logo_url %}<img src="{{ item.logo_url }}" alt="{{ item.symbol }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="mc-logo-fallback" style="display:none">{{ item.symbol|first }}</span>{% else %}<span class="mc-logo-fallback">{{ item.symbol|first }}</span>{% endif %}
@@ -499,6 +504,7 @@
                 </div>
                 <div class="price">{{ item.currency }} {{ item.price }}</div>
                 <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
+                <div class="mc-spark"></div>
             </a>
             {% endfor %}
         </div>
@@ -527,7 +533,7 @@
         </div>
         <div id="all_etf-cards" class="cards">
             {% for item in overview.etf %}
-            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}">
+            <a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}" data-spark="{{ item.spark|join:',' }}" data-up="{% if item.change_pct >= 0 %}1{% else %}0{% endif %}">
                 <div class="mc-header">
                     <div class="mc-logo">
                         {% if item.logo_url %}<img src="{{ item.logo_url }}" alt="{{ item.symbol }}" onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='flex'"><span class="mc-logo-fallback" style="display:none">{{ item.symbol|first }}</span>{% else %}<span class="mc-logo-fallback">{{ item.symbol|first }}</span>{% endif %}
@@ -536,6 +542,7 @@
                 </div>
                 <div class="price">{{ item.currency }} {{ item.price }}</div>
                 <div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div>
+                <div class="mc-spark"></div>
             </a>
             {% endfor %}
         </div>
@@ -561,43 +568,43 @@
 <div id="section-us" class="section">
     <div class="section-title">🇺🇸 Ações EUA</div>
     <div class="view-toggle"><button class="view-btn active" onclick="setView('us','cards',this)">⊞</button><button class="view-btn" onclick="setView('us','table',this)">☰</button></div>
-    <div id="us-cards" class="cards">{% for item in overview.us %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">{{ item.currency }} {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div></a>{% endfor %}</div>
+    <div id="us-cards" class="cards">{% for item in overview.us %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}" data-spark="{{ item.spark|join:',' }}" data-up="{% if item.change_pct >= 0 %}1{% else %}0{% endif %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">{{ item.currency }} {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div><div class="mc-spark"></div></a>{% endfor %}</div>
 </div>
 
 <div id="section-br" class="section">
     <div class="section-title">🇧🇷 Ações Brasil</div>
     <div class="view-toggle"><button class="view-btn active" onclick="setView('br','cards',this)">⊞</button><button class="view-btn" onclick="setView('br','table',this)">☰</button></div>
-    <div id="br-cards" class="cards">{% for item in overview.br %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">R$ {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div></a>{% endfor %}</div>
+    <div id="br-cards" class="cards">{% for item in overview.br %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}" data-spark="{{ item.spark|join:',' }}" data-up="{% if item.change_pct >= 0 %}1{% else %}0{% endif %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">R$ {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div><div class="mc-spark"></div></a>{% endfor %}</div>
 </div>
 
 <div id="section-fii" class="section">
     <div class="section-title">🏢 Fundos Imobiliários</div>
     <div class="view-toggle"><button class="view-btn active" onclick="setView('fii','cards',this)">⊞</button><button class="view-btn" onclick="setView('fii','table',this)">☰</button></div>
-    <div id="fii-cards" class="cards">{% for item in overview.fii %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">R$ {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div></a>{% endfor %}</div>
+    <div id="fii-cards" class="cards">{% for item in overview.fii %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}" data-spark="{{ item.spark|join:',' }}" data-up="{% if item.change_pct >= 0 %}1{% else %}0{% endif %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">R$ {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div><div class="mc-spark"></div></a>{% endfor %}</div>
 </div>
 
 <div id="section-crypto" class="section">
     <div class="section-title">₿ Criptomoedas</div>
     <div class="view-toggle"><button class="view-btn active" onclick="setView('crypto','cards',this)">⊞</button><button class="view-btn" onclick="setView('crypto','table',this)">☰</button></div>
-    <div id="crypto-cards" class="cards">{% for item in overview.crypto %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">$ {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div></a>{% endfor %}</div>
+    <div id="crypto-cards" class="cards">{% for item in overview.crypto %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}" data-spark="{{ item.spark|join:',' }}" data-up="{% if item.change_pct >= 0 %}1{% else %}0{% endif %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">$ {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div><div class="mc-spark"></div></a>{% endfor %}</div>
 </div>
 
 <div id="section-eu" class="section">
     <div class="section-title">🇪🇺 Ações Europa</div>
     <div class="view-toggle"><button class="view-btn active" onclick="setView('eu','cards',this)">⊞</button><button class="view-btn" onclick="setView('eu','table',this)">☰</button></div>
-    <div id="eu-cards" class="cards">{% for item in overview.eu %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">{{ item.currency }} {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div></a>{% endfor %}</div>
+    <div id="eu-cards" class="cards">{% for item in overview.eu %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}" data-spark="{{ item.spark|join:',' }}" data-up="{% if item.change_pct >= 0 %}1{% else %}0{% endif %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">{{ item.currency }} {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div><div class="mc-spark"></div></a>{% endfor %}</div>
 </div>
 
 <div id="section-cn" class="section">
     <div class="section-title">🇨🇳 Ações China/HK</div>
     <div class="view-toggle"><button class="view-btn active" onclick="setView('cn','cards',this)">⊞</button><button class="view-btn" onclick="setView('cn','table',this)">☰</button></div>
-    <div id="cn-cards" class="cards">{% for item in overview.cn %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">{{ item.currency }} {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div></a>{% endfor %}</div>
+    <div id="cn-cards" class="cards">{% for item in overview.cn %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}" data-spark="{{ item.spark|join:',' }}" data-up="{% if item.change_pct >= 0 %}1{% else %}0{% endif %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">{{ item.currency }} {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div><div class="mc-spark"></div></a>{% endfor %}</div>
 </div>
 
 <div id="section-etf" class="section">
     <div class="section-title">📊 ETFs Globais</div>
     <div class="view-toggle"><button class="view-btn active" onclick="setView('etf','cards',this)">⊞</button><button class="view-btn" onclick="setView('etf','table',this)">☰</button></div>
-    <div id="etf-cards" class="cards">{% for item in overview.etf %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">{{ item.currency }} {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div></a>{% endfor %}</div>
+    <div id="etf-cards" class="cards">{% for item in overview.etf %}<a class="market-card" href="{% url 'stock_detail' item.symbol_yf %}" data-spark="{{ item.spark|join:',' }}" data-up="{% if item.change_pct >= 0 %}1{% else %}0{% endif %}"><div class="symbol">{{ item.symbol }}</div><div class="name">{{ item.name }}</div><div class="price">{{ item.currency }} {{ item.price }}</div><div class="change {% if item.change_pct >= 0 %}up{% else %}down{% endif %}">{% if item.change_pct >= 0 %}▲{% else %}▼{% endif %} {{ item.change_pct }}%</div><div class="mc-spark"></div></a>{% endfor %}</div>
 </div>
 
 {% endblock %}
@@ -685,14 +692,23 @@ new Chart(document.getElementById('donutChart'), {
 });
 
 /* ── Bar chart (avg change) ── */
+var _ic = {
+    us:     '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>',
+    br:     '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+    fii:    '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    crypto: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894m-1.216 6.894L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.29 5.4m5.908 1.042.348-1.97M7.48 20.364l3.126-17.727"/></svg>',
+    eu:     '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+    cn:     '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    etf:    '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+};
 var cats = [
-    { name: '🇺🇸 EUA',     avg: avgUS,  color: '#3b82f6' },
-    { name: '🇧🇷 Brasil',  avg: avgBR,  color: '#16a34a' },
-    { name: '🏢 FIIs',    avg: avgFII, color: '#f59e0b' },
-    { name: '₿ Cripto',   avg: avgCRY, color: '#8b5cf6' },
-    { name: '🇪🇺 Europa',  avg: avgEU,  color: '#0369a1' },
-    { name: '🇨🇳 China',   avg: avgCN,  color: '#b91c1c' },
-    { name: '📊 ETFs',    avg: avgETF, color: '#0891b2' },
+    { name: _ic.us     + ' EUA',    avg: avgUS,  color: '#3b82f6' },
+    { name: _ic.br     + ' Brasil', avg: avgBR,  color: '#16a34a' },
+    { name: _ic.fii    + ' FIIs',   avg: avgFII, color: '#f59e0b' },
+    { name: _ic.crypto + ' Cripto', avg: avgCRY, color: '#8b5cf6' },
+    { name: _ic.eu     + ' Europa', avg: avgEU,  color: '#0369a1' },
+    { name: _ic.cn     + ' China',  avg: avgCN,  color: '#b91c1c' },
+    { name: _ic.etf    + ' ETFs',   avg: avgETF, color: '#0891b2' },
 ];
 
 var maxAbs = Math.max.apply(null, cats.map(function(c){ return Math.abs(c.avg); })) || 1;
@@ -721,5 +737,45 @@ cats.forEach(function(cat) {
 if (isDark) {
     Chart.defaults.color = '#9090a0';
 }
+
+/* ── Sparklines ── */
+(function () {
+    function renderSparkline(container, prices, isUp) {
+        if (!prices || prices.length < 2) return;
+        var W = 100, H = 36, pad = 3;
+        var min = Math.min.apply(null, prices);
+        var max = Math.max.apply(null, prices);
+        var range = max - min || 1;
+        var pts = prices.map(function (p, i) {
+            var x = (i / (prices.length - 1)) * W;
+            var y = H - pad - ((p - min) / range) * (H - pad * 2);
+            return x.toFixed(2) + ',' + y.toFixed(2);
+        }).join(' ');
+        var color  = isUp ? '#FFD600' : 'rgba(180,180,200,0.6)';
+        var fillId = 'sf' + Math.random().toString(36).slice(2);
+        var fillColor = isUp ? 'rgba(255,214,0,0.08)' : 'rgba(180,180,200,0.04)';
+        var lastPt = prices[prices.length - 1];
+        var lastX  = W;
+        var lastY  = (H - pad - ((lastPt - min) / range) * (H - pad * 2)).toFixed(2);
+        var closePts = pts + ' ' + lastX + ',' + H + ' 0,' + H;
+        container.innerHTML =
+            '<svg viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">' +
+            '<defs><linearGradient id="' + fillId + '" x1="0" y1="0" x2="0" y2="1">' +
+            '<stop offset="0%" stop-color="' + color + '" stop-opacity="0.15"/>' +
+            '<stop offset="100%" stop-color="' + color + '" stop-opacity="0"/>' +
+            '</linearGradient></defs>' +
+            '<polygon points="' + closePts + '" fill="url(#' + fillId + ')"/>' +
+            '<polyline points="' + pts + '" fill="none" stroke="' + color + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>' +
+            '</svg>';
+    }
+
+    document.querySelectorAll('.market-card[data-spark]').forEach(function (card) {
+        var raw = card.getAttribute('data-spark');
+        var isUp = card.getAttribute('data-up') === '1';
+        var prices = raw ? raw.split(',').map(Number).filter(function(n){ return !isNaN(n) && n > 0; }) : [];
+        var container = card.querySelector('.mc-spark');
+        if (container) renderSparkline(container, prices, isUp);
+    });
+}());
 </script>
 {% endblock %}
