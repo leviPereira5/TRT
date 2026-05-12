@@ -9,7 +9,7 @@
     <title>{% block title %}TRT Invest{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'monitor/css/main.css' %}?v=3">
+    <link rel="stylesheet" href="{% static 'monitor/css/main.css' %}?v=4">
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -159,18 +159,16 @@
 
 <script>
 (function () {
-    var body     = document.body;
     var themeBtn = document.getElementById('theme-btn');
 
     /* Theme */
     function setTheme(dark) {
-        body.classList.toggle('dark', dark);
         document.documentElement.classList.toggle('dark', dark);
         localStorage.setItem('trt-dark', dark);
     }
     setTheme(localStorage.getItem('trt-dark') === 'true');
     themeBtn.addEventListener('click', function () {
-        setTheme(!body.classList.contains('dark'));
+        setTheme(!document.documentElement.classList.contains('dark'));
     });
 
     /* Active nav */

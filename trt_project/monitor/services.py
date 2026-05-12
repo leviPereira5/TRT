@@ -14,6 +14,13 @@ FEATURED_US = ['AAPL','MSFT','GOOGL','AMZN','TSLA','NVDA','META','BRK-B']
 
 _YF_HEADERS = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
 
+TOP_BR_LIST = [
+    'PETR4.SA','VALE3.SA','ITUB4.SA','BBDC4.SA','ABEV3.SA','WEGE3.SA',
+    'RENT3.SA','RAIL3.SA','SUZB3.SA','RADL3.SA','PRIO3.SA','BBAS3.SA',
+    'B3SA3.SA','LREN3.SA','MGLU3.SA','VIVT3.SA','HAPV3.SA','RDOR3.SA',
+    'EQTL3.SA','CSAN3.SA',
+]
+
 TOP_FIIS_LIST = [
     'HGLG11.SA','XPML11.SA','KNRI11.SA','MXRF11.SA','VISC11.SA',
     'BRCO11.SA','GGRC11.SA','HSML11.SA','MALL11.SA','RBRR11.SA',
@@ -86,25 +93,14 @@ def fetch_top_movers():
             return []
 
     def _br_top():
-        try:
-            url     = 'https://query1.finance.yahoo.com/v1/finance/screener?formatted=false&lang=pt-BR&region=BR'
-            payload = {
-                'size': 10, 'offset': 0,
-                'sortField': 'percentchange', 'sortType': 'DESC',
-                'quoteType': 'EQUITY',
-                'query': {'operator': 'AND', 'operands': [
-                    {'operator': 'EQ', 'operands': ['exchange', 'SAO']},
-                    {'operator': 'GT', 'operands': ['percentchange', 0]},
-                ]},
-                'userId': '', 'userIdType': 'guid',
-            }
-            hdrs = {**_YF_HEADERS, 'Content-Type': 'application/json'}
-            data = requests.post(url, json=payload, headers=hdrs, timeout=6).json()
-            quotes = data['finance']['result'][0]['quotes']
-            return [_screener_to_item(q) for q in quotes if q.get('symbol')]
-        except Exception as e:
-            logger.warning(f"BR top movers: {e}")
-            return []
+        indexed = {}
+        with ThreadPoolExecutor(max_workers=10) as ex:
+            futures = {ex.submit(_fetch_single, s): i for i, s in enumerate(TOP_BR_LIST)}
+            for future in as_completed(futures):
+                r = future.result()
+                if r:
+                    indexed[futures[future]] = r
+        return sorted(indexed.values(), key=lambda x: x.get('change_pct', 0), reverse=True)[:10]
 
     def _fii_top():
         indexed = {}

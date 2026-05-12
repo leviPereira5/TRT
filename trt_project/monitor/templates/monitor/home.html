@@ -7,14 +7,38 @@
 
 {% block filter_bar %}
 <div class="filter-bar">
-    <button class="filter-btn active" onclick="showSection('all',this)">Todos</button>
-    <button class="filter-btn" onclick="showSection('us',this)">🇺🇸 Ações EUA</button>
-    <button class="filter-btn" onclick="showSection('br',this)">🇧🇷 Ações Brasil</button>
-    <button class="filter-btn" onclick="showSection('fii',this)">🏢 Fundos Imob.</button>
-    <button class="filter-btn" onclick="showSection('crypto',this)">₿ Cripto</button>
-    <button class="filter-btn" onclick="showSection('eu',this)">🇪🇺 Europa</button>
-    <button class="filter-btn" onclick="showSection('cn',this)">🇨🇳 China/HK</button>
-    <button class="filter-btn" onclick="showSection('etf',this)">📊 ETFs</button>
+    <button class="filter-btn active" onclick="showSection('all',this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Todos
+    </button>
+    <button class="filter-btn" onclick="showSection('us',this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Ações EUA
+    </button>
+    <button class="filter-btn" onclick="showSection('br',this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Ações Brasil
+    </button>
+    <button class="filter-btn" onclick="showSection('fii',this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Fundos Imob.
+    </button>
+    <button class="filter-btn" onclick="showSection('crypto',this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.767 19.089c4.924.868 6.14-6.025 1.216-6.894m-1.216 6.894L5.86 18.047m5.908 1.042-.347 1.97m1.563-8.864c4.924.869 6.14-6.025 1.215-6.893m-1.215 6.893-3.94-.694m5.155-6.2L8.29 5.4m5.908 1.042.348-1.97M7.48 20.364l3.126-17.727"/></svg>
+        Cripto
+    </button>
+    <button class="filter-btn" onclick="showSection('eu',this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Europa
+    </button>
+    <button class="filter-btn" onclick="showSection('cn',this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        China/HK
+    </button>
+    <button class="filter-btn" onclick="showSection('etf',this)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        ETFs
+    </button>
 </div>
 {% endblock %}
 
@@ -607,7 +631,7 @@ function setView(prefix, view, btn) {
 }
 
 /* ── Chart data from Django ── */
-var isDark   = document.body.classList.contains('dark');
+var isDark   = document.documentElement.classList.contains('dark');
 var usData   = {{ overview.us|length }};
 var brData   = {{ overview.br|length }};
 var fiiData  = {{ overview.fii|length }};

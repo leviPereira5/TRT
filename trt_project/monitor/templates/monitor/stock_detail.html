@@ -255,12 +255,6 @@
 .ind-panel { display: none; }
 .ind-panel.active { display: block; }
 
-/* ── Dark mode ── */
-body.dark .ind-card    { background: var(--white); border-color: var(--line); }
-body.dark .company-card { background: var(--white); border-color: var(--line); }
-body.dark .balance-card { background: var(--white); border-color: var(--line); }
-body.dark .ind-tabs     { border-color: var(--line); }
-body.dark .company-tag-gray { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.1); }
 </style>
 {% endblock %}
 
@@ -621,7 +615,7 @@ var labels = {{ chart_labels|safe }};
 var data   = {{ chart_data|safe }};
 var up     = data[data.length-1] >= data[0];
 var color  = up ? '#16a34a' : '#dc2626';
-var isDark = document.body.classList.contains('dark');
+var isDark = document.documentElement.classList.contains('dark');
 
 new Chart(document.getElementById('priceChart'), {
     type: 'line',
