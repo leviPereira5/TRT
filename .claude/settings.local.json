@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python manage.py test monitor --verbosity=2)",
+      "Bash(pip install *)"
+    ]
+  }
+}
