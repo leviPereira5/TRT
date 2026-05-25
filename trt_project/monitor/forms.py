@@ -14,7 +14,9 @@ class StockForm(forms.ModelForm):
 
     def clean_symbol(self):
         symbol = self.cleaned_data['symbol'].upper().strip()
-        tipo   = self.cleaned_data.get('tipo', 'stock_us')
+        # tipo is not yet in cleaned_data when clean_symbol runs (fields process in order),
+        # so read from raw POST data instead.
+        tipo   = self.data.get('tipo', 'stock_us')
         if tipo in ('stock_br', 'fii') and not symbol.endswith('.SA'):
             symbol = symbol + '.SA'
         if Stock.objects.filter(symbol=symbol).exists():
