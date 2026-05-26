@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(python manage.py test monitor --verbosity=2)",
-      "Bash(pip install *)"
+      "Bash(pip install *)",
+      "Bash(python -m pytest --version)",
+      "Bash(python -c \"import pytest_django; print\\('pytest-django ok'\\)\")",
+      "Bash(python -m pytest tests/unit/ -v)",
+      "Bash(git add *)",
+      "Bash(git reset *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
