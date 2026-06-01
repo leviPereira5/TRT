@@ -162,17 +162,20 @@ def fetch_top_movers():
 
 
 def fetch_price(symbol):
+    from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutTimeout
     for attempt in range(3):
         try:
-            ticker = yf.Ticker(symbol)
-            info   = ticker.info
-            price  = (
+            with ThreadPoolExecutor(max_workers=1) as ex:
+                info = ex.submit(lambda: yf.Ticker(symbol).info).result(timeout=5)
+            price = (
                 info.get("regularMarketPrice") or
                 info.get("currentPrice") or
                 info.get("previousClose")
             )
             if price and not (isinstance(price, float) and (math.isnan(price) or math.isinf(price))):
                 return Decimal(str(price))
+        except FutTimeout:
+            logger.warning(f"Timeout (5s) na tentativa {attempt+1} para {symbol}")
         except Exception as e:
             logger.warning(f"Tentativa {attempt+1} falhou para {symbol}: {e}")
     return None

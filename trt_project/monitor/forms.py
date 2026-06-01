@@ -19,6 +19,8 @@ class StockForm(forms.ModelForm):
         tipo   = self.data.get('tipo', 'stock_us')
         if tipo in ('stock_br', 'fii') and not symbol.endswith('.SA'):
             symbol = symbol + '.SA'
+        elif tipo == 'crypto' and not symbol.endswith('-USD'):
+            symbol = symbol + '-USD'
         if Stock.objects.filter(symbol=symbol).exists():
             raise forms.ValidationError(f"{symbol} já está na lista.")
         return symbol

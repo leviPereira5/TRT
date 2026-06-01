@@ -319,7 +319,7 @@ def stock_set_thresholds(request, pk):
                 stock.save()
                 messages.success(request, f'Alertas de {stock.display_symbol()} atualizados: ▲{high}% / ▼{low}%.')
         except (InvalidOperation, ValueError):
-            messages.error(request, 'Valores inválidos.')
+            messages.error(request, 'Valor inválido. Introduza um número entre 0 e 100 (ex: 5.00).')
     return redirect('stock_list')
 
 
