@@ -67,6 +67,8 @@ python manage.py runserver
 
 Aceder em: **http://127.0.0.1:8000/**
 
+> Aplicação em produção: **https://levipereiratrt.pythonanywhere.com**
+
 ### Criar superutilizador (opcional)
 
 ```bash
