@@ -189,6 +189,11 @@ TRT/
 
 ---
 
-## Autor
+## Autores
 
 Trabalho de Requisitos e Testes — Engenharia Informática
+
+- **RS** Rodrigo dos Santos
+- **JL** José Leite
+- **MM** Marwan Ghunim
+- **LR** Levi Reis Pereira
